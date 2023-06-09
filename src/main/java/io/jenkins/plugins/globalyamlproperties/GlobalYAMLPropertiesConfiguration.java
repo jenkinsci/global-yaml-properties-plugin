@@ -1,4 +1,4 @@
-package io.jenkins.plugins.globalproperties;
+package io.jenkins.plugins.globalyamlproperties;
 
 import hudson.Extension;
 import hudson.ExtensionList;
@@ -17,17 +17,17 @@ import org.yaml.snakeyaml.error.YAMLException;
  * Example of Jenkins global configuration.
  */
 @Extension
-public class PropertiesConfiguration extends GlobalConfiguration {
+public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration {
 
     /** @return the singleton instance */
-    public static PropertiesConfiguration get() {
-        return ExtensionList.lookupSingleton(PropertiesConfiguration.class);
+    public static GlobalYAMLPropertiesConfiguration get() {
+        return ExtensionList.lookupSingleton(GlobalYAMLPropertiesConfiguration.class);
     }
 
     private String yamlConfig = "";
     private HashMap<String, Object> configMap = new HashMap<>();
 
-    public PropertiesConfiguration() {
+    public GlobalYAMLPropertiesConfiguration() {
         // When Jenkins is restarted, load any saved configuration from disk.
         load();
     }
@@ -67,11 +67,11 @@ public class PropertiesConfiguration extends GlobalConfiguration {
         // Exception will be thrown also when YAML is actually valid but can not be cast to Map.
         try {
             Object parsedYAML = parser.load(value);
-            if (!(parsedYAML instanceof Map)) throw new GlobalPropertiesConfigurationException("Provided config is not a Map");
+            if (!(parsedYAML instanceof Map)) throw new GlobalYAMLPropertiesConfigurationException("Provided config's root element is not a Map");
         } catch (YAMLException e) {
             return FormValidation.error("Config is not a valid YAML file.");
-        } catch (GlobalPropertiesConfigurationException e) {
-            return FormValidation.error("Specified YAML is valid, but can not be parsed to Map. Please, use key-value format.");
+        } catch (GlobalYAMLPropertiesConfigurationException e) {
+            return FormValidation.error("Specified YAML is valid, but root element is not a Map. Please, use key-value format for root element.");
         }
 
         return FormValidation.ok("YAML config is valid");

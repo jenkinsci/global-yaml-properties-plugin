@@ -64,10 +64,10 @@
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>global-properties</artifactId>
+    <artifactId>global-yaml-properties</artifactId>
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
-    <name>Global Properties Plugin</name>
+    <name>Global YAML Properties</name>
     <url>https://github.com/siklu/${project.artifactId}-plugin</url>
     <licenses>
         <license>

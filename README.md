@@ -21,6 +21,13 @@ You have to build product using old version of shared library, where FTP address
 Global Properties Plugin allows you to define FTP address in one place and update it easily. In shred library you can just obtain value from global configuration and it will be always correct across all versions of shared library.
 2. Unify handling of actual configuration: The plugin provides a unified and centralized location to handle actual configurations used across various places within Jenkins. As configurations may change or become deprecated over time, the GlobalProperties Plugin offers a streamlined approach to manage and update these configurations effectively. By consolidating them in one place, it promotes consistency and simplifies the configuration management process.
 ## Getting started
+### Recommendations:
+1. Think twice about configurations and format you want to put into global properties.
+   If the keys and format changes frequently, this eliminates the benefit of backwards compatibility.
+
+2. DO NOT put there sensitive data like passwords or tokens.
+   If you need to put there some sensitive data, you can use [Credentials Plugin](https://plugins.jenkins.io/credentials/) and [Credentials Binding Plugin](https://plugins.jenkins.io/credentials-binding/) to access them in your pipeline.
+   In this case global properties can be nice feature for handling credential IDs.
 
 ### Configuration
 At first, define your YAML configuration in the global configuration page of Jenkins.
@@ -33,10 +40,10 @@ Then, you can access the configuration in your pipeline or freestyle job.
 
 ### Usage
 
-Step returns HashMap object which is parsed from YAML configuration.
+Step `getGlobalYAMLProperties` returns HashMap object which is parsed from YAML configuration.
 Here is pipeline example which explains to access the configuration:
 ```groovy
-def myProperties = getGlobalProperties()
+def myProperties = getGlobalYAMLProperties()
 String message = "Message for:\n${myProperties['devopsTeam'].join('\n')}\n"
 message += "Guys, you don't need to update FTP server into each pipeline separately,\n"
 message += "I've put FTP address to Global Properties and updated it easily in one place.\n"

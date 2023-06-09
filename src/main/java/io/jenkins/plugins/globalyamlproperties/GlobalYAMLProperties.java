@@ -1,4 +1,4 @@
-package io.jenkins.plugins.globalproperties;
+package io.jenkins.plugins.globalyamlproperties;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -11,9 +11,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class GlobalProperties extends Step {
+public class GlobalYAMLProperties extends Step {
 
-    @DataBoundConstructor public GlobalProperties() {}
+    @DataBoundConstructor public GlobalYAMLProperties() {
+        // Empty due no arguments required to call step
+    }
 
     @Override
     public StepExecution start(StepContext context) throws Exception {
@@ -32,7 +34,7 @@ public class GlobalProperties extends Step {
         protected Map<String, Object> run() throws Exception {
             StepContext context = getContext();
             PrintStream logger = context.get(TaskListener.class).getLogger();
-            PropertiesConfiguration globalPropertiesConfig = PropertiesConfiguration.get();
+            GlobalYAMLPropertiesConfiguration globalPropertiesConfig = GlobalYAMLPropertiesConfiguration.get();
             Map<String, Object> globalPropertiesConfigMap = globalPropertiesConfig.getConfigMap();
             if (globalPropertiesConfigMap.isEmpty()) {
                 logger.println("[GetGlobalProperties] Warning: Configuration is empty");
@@ -59,13 +61,13 @@ public class GlobalProperties extends Step {
 
         @Override
         public String getFunctionName() {
-            return "getGlobalProperties";
+            return "getGlobalYAMLProperties";
         }
 
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Get Global Properties from Global Configuration";
+            return "Get Global YAML Properties in HashMap format";
         }
 
         @Override
