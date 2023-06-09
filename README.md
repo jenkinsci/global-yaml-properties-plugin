@@ -21,7 +21,7 @@ By centralizing and managing these properties within the plugin, it allows for e
 **Real life example:** You have self-hosted shared library that obtains toolchain from FTP to workspace and builds your product by running some commands.
 Build commands and FTP address can be changed over time. Now imagine situation when you need to build old version of your product.
 You have to build product using old version of shared library, where FTP address is deprecated.
-Global Properties Plugin allows you to define FTP address in one place and update it easily. In shred library you can just obtain value from global configuration and it will be always correct across all versions of shared library.
+Global YAML Properties Plugin allows you to define FTP address in one place and update it easily. In shred library you can just obtain value from global configuration and it will be always correct across all versions of shared library.
 
 ## Getting started
 ### Recommendations:
