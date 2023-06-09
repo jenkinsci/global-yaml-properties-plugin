@@ -15,17 +15,20 @@ With the GlobalProperties Plugin, you can efficiently manage environment-specifi
 
 1. Backward compatibility for shared libraries: The GlobalProperties Plugin aims to ensure backward compatibility for private shared libraries that contain environment-specific information such as IP addresses, ports, and other configuration details. 
 By centralizing and managing these properties within the plugin, it allows for easier maintenance and updates, ensuring smooth integration with existing libraries.
-Example: You have self-hosted shared library that obtains toolchain from FTP to workspace and builds your product by running some commands.
+
+2. Unify handling of actual configuration: The plugin provides a unified and centralized location to handle actual configurations used across various places within Jenkins. As configurations may change or become deprecated over time, the GlobalProperties Plugin offers a streamlined approach to manage and update these configurations effectively. By consolidating them in one place, it promotes consistency and simplifies the configuration management process.
+
+**Real life example:** You have self-hosted shared library that obtains toolchain from FTP to workspace and builds your product by running some commands.
 Build commands and FTP address can be changed over time. Now imagine situation when you need to build old version of your product.
 You have to build product using old version of shared library, where FTP address is deprecated.
 Global Properties Plugin allows you to define FTP address in one place and update it easily. In shred library you can just obtain value from global configuration and it will be always correct across all versions of shared library.
-2. Unify handling of actual configuration: The plugin provides a unified and centralized location to handle actual configurations used across various places within Jenkins. As configurations may change or become deprecated over time, the GlobalProperties Plugin offers a streamlined approach to manage and update these configurations effectively. By consolidating them in one place, it promotes consistency and simplifies the configuration management process.
+
 ## Getting started
 ### Recommendations:
 1. Think twice about configurations and format you want to put into global properties.
    If the keys and format changes frequently, this eliminates the benefit of backwards compatibility.
 
-2. DO NOT put there sensitive data like passwords or tokens.
+2. **DO NOT** put there sensitive data like passwords or tokens.
    If you need to put there some sensitive data, you can use [Credentials Plugin](https://plugins.jenkins.io/credentials/) and [Credentials Binding Plugin](https://plugins.jenkins.io/credentials-binding/) to access them in your pipeline.
    In this case global properties can be nice feature for handling credential IDs.
 
