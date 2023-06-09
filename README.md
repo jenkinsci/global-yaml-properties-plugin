@@ -1,22 +1,22 @@
-# Global Properties Plugin
+# Global YAML Properties Plugin
 
 ## Introduction
 
-The GlobalProperties Plugin is a universal extension for Jenkins that enhances the global configuration page by adding a custom configurations field.
+The Global YAML Properties Plugin is a universal extension for Jenkins that enhances the global configuration page by adding a custom configurations field.
 This field allows users to define global properties in YAML format, which is then parsed into a HashMap and can be accessed throughout specific build step.
 
 The plugin simplifies the management of global properties and configurations by centralizing them within Jenkins. You can define key-value pairs, nested structures, and arrays using YAML, making it easier to express complex relationships.
 
 Once the properties are saved, they are automatically parsed into a HashMap, enabling easy access throughout your Jenkins pipelines or jobs. This promotes dynamic and customizable workflows.
 
-With the GlobalProperties Plugin, you can efficiently manage environment-specific variables, deployment settings, and other configurable parameters. Say goodbye to scattered configuration files and embrace streamlined configuration management within Jenkins.
+With the Global YAML Properties Plugin, you can efficiently manage environment-specific variables, deployment settings, and other configurable parameters. Say goodbye to scattered configuration files and embrace streamlined configuration management within Jenkins.
 
 ### Main Goals
 
-1. Backward compatibility for shared libraries: The GlobalProperties Plugin aims to ensure backward compatibility for private shared libraries that contain environment-specific information such as IP addresses, ports, and other configuration details. 
+1. Backward compatibility for shared libraries: The Global YAML Properties Plugin aims to ensure backward compatibility for private shared libraries that contain environment-specific information such as IP addresses, ports, and other configuration details. 
 By centralizing and managing these properties within the plugin, it allows for easier maintenance and updates, ensuring smooth integration with existing libraries.
 
-2. Unify handling of actual configuration: The plugin provides a unified and centralized location to handle actual configurations used across various places within Jenkins. As configurations may change or become deprecated over time, the GlobalProperties Plugin offers a streamlined approach to manage and update these configurations effectively. By consolidating them in one place, it promotes consistency and simplifies the configuration management process.
+2. Unify handling of actual configuration: The plugin provides a unified and centralized location to handle actual configurations used across various places within Jenkins. As configurations may change or become deprecated over time, the Global YAML Properties Plugin offers a streamlined approach to manage and update these configurations effectively. By consolidating them in one place, it promotes consistency and simplifies the configuration management process.
 
 **Real life example:** You have self-hosted shared library that obtains toolchain from FTP to workspace and builds your product by running some commands.
 Build commands and FTP address can be changed over time. Now imagine situation when you need to build old version of your product.
