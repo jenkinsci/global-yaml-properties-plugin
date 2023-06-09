@@ -1,2 +1,2 @@
 _extends: .github
-tag-template: global-properties-plugin-$NEXT_MINOR_VERSION
+tag-template: global-yaml-properties-plugin-$NEXT_MINOR_VERSION
