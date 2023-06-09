@@ -28,10 +28,10 @@ Step returns HashMap object which is parsed from YAML configuration.
 Here is pipeline example which explains to access the configuration:
 ```groovy
 def myProperties = getGlobalProperties()
-String message = "Message for:\n${myProperties['devopsTeam'].join('\n')}"
-message += "\nGuys, you don't need to update FTP server into each pipeline separately,"
-message += "\nI've put FTP address to Global Properties and updated it easily in one place."
-message += "\nLet's go drink beer."
+String message = "Message for:\n${myProperties['devopsTeam'].join('\n')}\n"
+message += "Guys, you don't need to update FTP server into each pipeline separately,\n"
+message += "I've put FTP address to Global Properties and updated it easily in one place.\n"
+message += "Let's go drink beer."
 echo message
 String ftpCommand = "curl -O ftp://${myProperties.ftpServerAddress}/path/to/file"
 println "Command to download file from internal ftp:"
