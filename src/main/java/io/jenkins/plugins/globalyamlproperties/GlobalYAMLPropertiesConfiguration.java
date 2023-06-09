@@ -4,12 +4,15 @@ import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -59,7 +62,11 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration {
         return this.configMap;
     }
 
+    @POST
     public FormValidation doCheckYamlConfig(@QueryParameter String value) {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+            return FormValidation.error("Only administrators can update global configuration.");
+        }
         if (StringUtils.isEmpty(value)) {
             return FormValidation.warning("Config is empty.");
         }
