@@ -36,8 +36,10 @@ public class GlobalProperties extends Step {
             Map<String, Object> globalPropertiesConfigMap = globalPropertiesConfig.getConfigMap();
             if (globalPropertiesConfigMap.isEmpty()) {
                 logger.println("[GetGlobalProperties] Warning: Configuration is empty");
+            } else {
+                logger.println("[GetGlobalProperties] Obtained configuration:");
+                globalPropertiesConfigMap.forEach((k, v) -> logger.println(k + " : " + v));
             }
-            globalPropertiesConfigMap.forEach((k, v) -> logger.println(k + " : " + v));
             return deepCopyMap(globalPropertiesConfigMap);
         }
 

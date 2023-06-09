@@ -74,7 +74,7 @@ public class PropertiesConfiguration extends GlobalConfiguration {
             return FormValidation.error("Specified YAML is valid, but can not be parsed to Map. Please, use key-value format.");
         }
 
-        return FormValidation.ok();
+        return FormValidation.ok("YAML config is valid");
     }
 
 }
