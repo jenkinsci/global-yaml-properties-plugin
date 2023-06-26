@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    TODO
+    Define globally accessible variables in YAML format to handle environment-related data.
 </div>
