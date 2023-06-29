@@ -43,10 +43,11 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration {
     }
 
     /**
-     * Parse YAML from {@param yamlConfig} and save it to global configuration
+     * Parse YAML from yamlConfig parameter and save it to global configuration
      * Please note that this method is called when user saves configuration in Jenkins UI.
      * Call it manually from Java code only when you understand what you are doing.
-     * @param yamlConfig the new value of this field
+     * @param yamlConfig
+     *     the new value of this field
      */
     @DataBoundSetter
     public void setYamlConfig(String yamlConfig) {
