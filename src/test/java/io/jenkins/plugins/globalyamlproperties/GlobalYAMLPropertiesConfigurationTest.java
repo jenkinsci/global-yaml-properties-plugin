@@ -21,6 +21,18 @@ public class GlobalYAMLPropertiesConfigurationTest {
     public String name = "test";
     public String emptyYamlConfig = "";
 
+
+    @Test
+    public void testConfigApi() {
+        GlobalYAMLPropertiesConfiguration globalConfiguration = GlobalYAMLPropertiesConfiguration.get();
+        List<Config> config = new ArrayList<>();
+        config.add(new Config(name, emptyYamlConfig));
+        config.get(0).setYamlConfig(yamlConfig);
+        assert config.get(0).getYamlConfig().equals(yamlConfig);
+        assert config.get(0).getName().equals(name);
+        assert config.get(0).getConfigMap().containsKey("version");
+    }
+
     @Test
     public void testScriptedPipeline() throws Exception {
         String agentLabel = "my-agent";
