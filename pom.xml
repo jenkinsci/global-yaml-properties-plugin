@@ -34,7 +34,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>global-yaml-properties</artifactId>
-    <version>${revision}${changelist}</version>
+    <version>${revision}.${changelist}</version>
     <packaging>hpi</packaging>
     <name>Global YAML Properties</name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
@@ -51,8 +51,8 @@
         <url>https://github.com/${gitHubRepo}</url>
     </scm>
     <properties>
-        <revision>1.0</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>1</revision>
+        <changelist>999999-SNAPSHOT</changelist>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
         <jenkins.version>2.387.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
