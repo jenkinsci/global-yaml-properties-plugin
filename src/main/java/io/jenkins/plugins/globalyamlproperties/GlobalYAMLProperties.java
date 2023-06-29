@@ -12,22 +12,27 @@ import java.util.Map;
 import java.util.Set;
 
 public class GlobalYAMLProperties extends Step {
+    private String configName = "";
 
-    @DataBoundConstructor public GlobalYAMLProperties() {
-        // Empty due no arguments required to call step
+    @DataBoundConstructor public GlobalYAMLProperties(String configName) {
+        if (configName != null) {
+            this.configName = configName;
+        }
     }
 
     @Override
     public StepExecution start(StepContext context) throws Exception {
-        return new GlobalPropertiesStepExecution(context);
+        return new GlobalPropertiesStepExecution(context, configName);
     }
 
     private static class GlobalPropertiesStepExecution extends SynchronousStepExecution<Map<String, Object>> {
 
+        private final String configName;
         private static final long serialVersionUID = 1L;
 
-        protected GlobalPropertiesStepExecution(StepContext context) {
+        protected GlobalPropertiesStepExecution(StepContext context, String configName) {
             super(context);
+            this.configName = configName;
         }
 
         @Override
@@ -35,7 +40,15 @@ public class GlobalYAMLProperties extends Step {
             StepContext context = getContext();
             PrintStream logger = context.get(TaskListener.class).getLogger();
             GlobalYAMLPropertiesConfiguration globalPropertiesConfig = GlobalYAMLPropertiesConfiguration.get();
-            Map<String, Object> globalPropertiesConfigMap = globalPropertiesConfig.getConfigMap();
+            Map<String, Object> globalPropertiesConfigMap;
+            if (configName != null && !configName.isEmpty()) {
+                logger.println("[GetGlobalProperties] Obtaining configuration for " + configName);
+                globalPropertiesConfigMap = globalPropertiesConfig.getConfigByName(configName).getConfigMap();
+            } else {
+                logger.println("[GetGlobalProperties] Obtaining default configuration");
+                globalPropertiesConfigMap = globalPropertiesConfig.getDefaultConfig().getConfigMap();
+            }
+
             if (globalPropertiesConfigMap.isEmpty()) {
                 logger.println("[GetGlobalProperties] Warning: Configuration is empty");
             } else {

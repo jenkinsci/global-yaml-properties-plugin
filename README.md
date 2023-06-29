@@ -43,7 +43,9 @@ Then, you can access the configuration in your pipeline or freestyle job.
 
 ### Usage
 
-Step `getGlobalYAMLProperties` returns HashMap object which is parsed from YAML configuration.
+Step `getGlobalYAMLProperties` without arguments returns HashMap object which is parsed from default YAML configuration.
+Default YAML configuration is the first configuration in the list of Global Configuration.
+
 Here is pipeline example which explains to access the configuration:
 ```groovy
 def myProperties = getGlobalYAMLProperties()
@@ -58,6 +60,14 @@ println ftpCommand
 ```
 Pipeline output:
 ![Global Properties Configuration](docs/images/output_example.png)
+
+Also you can use step `getGlobalYAMLProperties` with argument `name` to get specific config by name from Global Configuration.
+```groovy
+def myProperties = getGlobalYAMLProperties("Test")
+println myProperties.myValue
+```
+Pipeline output:
+![Global Properties Configuration](docs/images/output_specific_config_example.png)
 
 ## Issues
 
