@@ -17,13 +17,14 @@ import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-public class Config extends AbstractDescribableImpl<Config> {
+public class Config extends AbstractDescribableImpl<Config> implements Serializable {
 
     private String name;
     private String yamlConfig;
