@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.Rule;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +23,46 @@ public class GlobalYAMLPropertiesConfigurationTest {
     public String emptyYamlConfig = "";
 
 
-    @Test
-    public void testConfigApi() {
+    GlobalYAMLPropertiesConfiguration createTestInstance() {
         GlobalYAMLPropertiesConfiguration globalConfiguration = GlobalYAMLPropertiesConfiguration.get();
         List<Config> config = new ArrayList<>();
         config.add(new Config(name, emptyYamlConfig));
         config.get(0).setYamlConfig(yamlConfig);
-        assert config.get(0).getYamlConfig().equals(yamlConfig);
-        assert config.get(0).getName().equals(name);
-        assert config.get(0).getConfigMap().containsKey("version");
+        globalConfiguration.setConfigs(config);
+        return globalConfiguration;
+    }
+
+    @Test
+    public void testConfigApi() throws GlobalYAMLPropertiesConfigurationException {
+        GlobalYAMLPropertiesConfiguration globalConfiguration = createTestInstance();
+        assert globalConfiguration.getConfigByName(name).getYamlConfig().equals(yamlConfig);
+        assert globalConfiguration.getConfigs().get(0).getYamlConfig().equals(yamlConfig);
+        assert globalConfiguration.getConfigs().get(0).getName().equals(name);
+        assert globalConfiguration.getConfigs().get(0).getConfigMap().containsKey("version");
+    }
+
+    @Test
+    public void testSerialization() throws IOException {
+        GlobalYAMLPropertiesConfiguration globalConfiguration = createTestInstance();
+
+        // Serialize the object to a byte array
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(globalConfiguration);
+        objectOutputStream.close();
+
+        // Deserialize the object from the byte array
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+        try {
+            Object deserializedObject = objectInputStream.readObject();
+            // The deserialization should be successful
+            assert deserializedObject instanceof GlobalYAMLPropertiesConfiguration;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            objectInputStream.close();
+        }
     }
 
     @Test

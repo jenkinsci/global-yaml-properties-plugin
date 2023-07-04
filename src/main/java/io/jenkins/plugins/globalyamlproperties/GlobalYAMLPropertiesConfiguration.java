@@ -18,6 +18,7 @@ import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
  * Example of Jenkins global configuration.
  */
 @Extension
-public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration {
+public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(GlobalYAMLPropertiesConfiguration.class.getName());
     /** @return the singleton instance */
     public static GlobalYAMLPropertiesConfiguration get() {
