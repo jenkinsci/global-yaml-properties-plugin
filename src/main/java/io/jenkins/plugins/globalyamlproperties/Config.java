@@ -28,6 +28,7 @@ public class Config extends AbstractDescribableImpl<Config> implements Serializa
 
     private String name;
     private String yamlConfig;
+    private String category;
     private HashMap<String, Object> configMap = new HashMap<>();
 
     @DataBoundConstructor
@@ -51,6 +52,15 @@ public class Config extends AbstractDescribableImpl<Config> implements Serializa
         this.configMap = parser.load(yamlConfig);
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    @DataBoundSetter
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getName() {
         return name;
     }
@@ -69,7 +79,7 @@ public class Config extends AbstractDescribableImpl<Config> implements Serializa
         @POST
         public FormValidation doCheckName(@QueryParameter String value) {
             if (StringUtils.isEmpty(value)) {
-                return FormValidation.warning("Name is empty");
+                return FormValidation.error("Name is empty");
             }
             return FormValidation.ok();
         }
@@ -92,7 +102,7 @@ public class Config extends AbstractDescribableImpl<Config> implements Serializa
                 return FormValidation.error("Config is not a valid YAML file");
             } catch (GlobalYAMLPropertiesConfigurationException e) {
                 return FormValidation.error(
-                        "Specified YAML is valid, but root element is not a Map. Please, use key-value format for root element");
+                    "Specified YAML is valid, but root element is not a Map. Please, use key-value format for root element");
             }
 
             return FormValidation.ok("YAML config is valid");

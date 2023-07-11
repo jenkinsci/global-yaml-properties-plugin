@@ -8,6 +8,7 @@ import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -19,11 +20,9 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Example of Jenkins global configuration.
@@ -56,6 +55,45 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
         throw new GlobalYAMLPropertiesConfigurationException("Config with name " + name + " not found");
     }
 
+    public List<String> getConfigNames() {
+        List<String> configNames = new ArrayList<>();
+        for (Config config : configs) {
+            configNames.add(config.getName());
+        }
+        return configNames;
+    }
+
+    public List<Config> getConfigsByCategory(String category) throws GlobalYAMLPropertiesConfigurationException {
+        List<Config> collectedConfigs = new ArrayList<>();
+        for (Config config : configs) {
+            if (config.getCategory().equals(category)) {
+                collectedConfigs.add(config);
+            }
+        }
+        return collectedConfigs;
+    }
+
+    public List<String> getConfigNamesByCategory(String category) throws GlobalYAMLPropertiesConfigurationException {
+        List<String> collectedConfigNames = new ArrayList<>();
+        for (Config config : configs) {
+            if (config.getCategory().equals(category)) {
+                collectedConfigNames.add(config.getName());
+            }
+        }
+        return collectedConfigNames;
+    }
+
+    public List<String> getCategories() {
+        Set<String> categories = new HashSet<>();
+        for(final Config config: getConfigs()) {
+            if (config.getCategory() == null || config.getCategory().isEmpty()) {
+                continue;
+            }
+            categories.add(config.getCategory());
+        }
+        return new ArrayList<>(categories);
+    }
+
     public Config getDefaultConfig() {
         return configs.get(0);
     }
@@ -69,36 +107,47 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
         if (!json.has("configs")) {
-            throw new FormException("Configs must be an array", "configs");
+            return true;
         }
+        String configNameField = "name";
+        String yamlConfigField = "yamlConfig";
 
         Config.DescriptorImpl configDescriptor = Jenkins.get().getDescriptorByType(Config.DescriptorImpl.class);
 
-        net.sf.json.JSONArray configs = json.getJSONArray("configs");
+        Object configs = json.get("configs");
+        List<JSONObject> configList = new ArrayList<>();
 
-        for (Object obj : configs) {
-            if (!(obj instanceof JSONObject)) continue;
-            JSONObject configJson = (JSONObject) obj;
+        if(configs instanceof net.sf.json.JSONArray) {
+            net.sf.json.JSONArray configsArray = json.getJSONArray("configs");
+            for (Object config : configsArray) {
+                configList.add((JSONObject) config);
+            }
+        } else if(configs instanceof JSONObject){
+            configList.add((JSONObject)configs);
+        }
 
 
-            if (!configJson.has("name") || !(configJson.get("name") instanceof String)) {
-                throw new FormException("Name must be a string", "name");
+        for (JSONObject obj : configList) {
+            if (obj == null) continue;
+
+            if (!obj.has(configNameField) || !(obj.get(configNameField) instanceof String)) {
+                throw new FormException("Global YAML Configuration is not valid: Config name must be a string", configNameField);
             }
 
             // If the "yamlConfig" key does not exist or is not a string, validation fails
-            if (!configJson.has("yamlConfig") || !(configJson.get("yamlConfig") instanceof String)) {
-                throw new FormException("YAML config must be a string", "yamlConfig");
+            if (!obj.has(yamlConfigField) || !(obj.get(yamlConfigField) instanceof String)) {
+                throw new FormException("YAML config must be a string", yamlConfigField);
             }
 
             // Perform the validation
-            FormValidation nameValidation = configDescriptor.doCheckName(configJson.getString("name"));
+            FormValidation nameValidation = configDescriptor.doCheckName(obj.getString(configNameField));
             if (nameValidation.kind != FormValidation.Kind.OK) {
-                throw new FormException(nameValidation.getMessage(), "name");
+                throw new FormException("Global YAML Configuration is not valid: " + nameValidation.getMessage(), configNameField);
             }
 
-            FormValidation yamlConfigValidation = configDescriptor.doCheckYamlConfig(configJson.getString("yamlConfig"));
-            if (yamlConfigValidation.kind != FormValidation.Kind.OK) {
-                throw new FormException(yamlConfigValidation.getMessage(), "yamlConfig");
+            FormValidation yamlConfigValidation = configDescriptor.doCheckYamlConfig(obj.getString(yamlConfigField));
+            if (yamlConfigValidation.kind == FormValidation.Kind.ERROR) {
+                throw new FormException("Global YAML Configuration [" + obj.get(configNameField) + "] is not valid: " + yamlConfigValidation.getMessage(), yamlConfigField);
             }
         }
 

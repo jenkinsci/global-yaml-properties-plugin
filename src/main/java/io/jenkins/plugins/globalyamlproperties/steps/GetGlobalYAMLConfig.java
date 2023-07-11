@@ -1,23 +1,35 @@
-package io.jenkins.plugins.globalyamlproperties;
+package io.jenkins.plugins.globalyamlproperties.steps;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.TaskListener;
+import io.jenkins.plugins.globalyamlproperties.GlobalYAMLPropertiesConfiguration;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class GlobalYAMLProperties extends Step {
+public class GetGlobalYAMLConfig extends Step {
     private String configName = "";
 
-    @DataBoundConstructor public GlobalYAMLProperties(String configName) {
+    @DataBoundConstructor public GetGlobalYAMLConfig(String configName) {
         if (configName != null) {
             this.configName = configName;
         }
+    }
+
+    @DataBoundSetter
+    public void setConfigName(String configName) {
+        this.configName = configName;
+    }
+
+    public String getConfigName() {
+        return configName;
     }
 
     @Override
@@ -45,15 +57,12 @@ public class GlobalYAMLProperties extends Step {
                 logger.println("[GetGlobalProperties] Obtaining configuration for " + configName);
                 globalPropertiesConfigMap = globalPropertiesConfig.getConfigByName(configName).getConfigMap();
             } else {
-                logger.println("[GetGlobalProperties] Obtaining default configuration");
+                logger.println("[GetGlobalProperties] Obtaining default configuration (" + globalPropertiesConfig.getDefaultConfig().getName() + ")");
                 globalPropertiesConfigMap = globalPropertiesConfig.getDefaultConfig().getConfigMap();
             }
 
             if (globalPropertiesConfigMap.isEmpty()) {
                 logger.println("[GetGlobalProperties] Warning: Configuration is empty");
-            } else {
-                logger.println("[GetGlobalProperties] Obtained configuration:");
-                globalPropertiesConfigMap.forEach((k, v) -> logger.println(k + " : " + v));
             }
             return deepCopyMap(globalPropertiesConfigMap);
         }
@@ -69,6 +78,7 @@ public class GlobalYAMLProperties extends Step {
         }
     }
 
+    @Symbol("getGlobalYAMLProperties")
     @Extension
     public static final class DescriptorImpl extends StepDescriptor {
 
