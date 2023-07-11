@@ -59,6 +59,7 @@ println "Command to download file from internal ftp:"
 println ftpCommand
 ```
 Pipeline output:
+
 ![Global Properties Configuration](docs/images/output_example.png)
 
 Also you can use step `getGlobalYAMLProperties` with argument `name` to get specific config by name from Global Configuration.
@@ -67,7 +68,17 @@ def myProperties = getGlobalYAMLProperties("Test")
 println myProperties.myValue
 ```
 Pipeline output:
+
 ![Global Properties Configuration](docs/images/output_specific_config_example.png)
+
+Here are complete steps definitions:
+
+| Step                               | Description                                                                                                       | Parameters                     |
+|------------------------------------|-------------------------------------------------------------------------------------------------------------------|--------------------------------|
+| getGlobalYAMLProperties            | Get configuration in LinkedHashMap format. If name is not specified, first defined configuration will be obtained | [String] configName (Optional) |
+| getGlobalYAMLConfigNames           | Get names of all defined configurations                                                                           |                                |
+| getGlobalYAMLCategories            | Get all defined categories                                                                                        |                                |
+| getGlobalYAMLConfigNamesByCategory | Get all config names that belongs to category                                                                     | [String] category              |
 
 ## Issues
 
