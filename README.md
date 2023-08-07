@@ -2,8 +2,8 @@
 
 ## Introduction
 
-The Global YAML Properties Plugin is a universal extension for Jenkins that enhances the global configuration page by adding a custom configurations field.
-This field allows users to define global properties in YAML format, which is then parsed into a HashMap and can be accessed throughout specific build step.
+The Global YAML Properties Plugin is a universal extension for Jenkins that enhances the Manage Jenkins page by adding a Global YAML Configuration page.
+This page allows users to define global properties in YAML format, which is then parsed into a HashMap and can be accessed throughout specific build step.
 
 The plugin simplifies the management of global properties and configurations by centralizing them within Jenkins. You can define key-value pairs, nested structures, and arrays using YAML, making it easier to express complex relationships.
 
@@ -35,11 +35,22 @@ Global YAML Properties Plugin allows you to define FTP address in one place and 
 ### Configuration
 At first, define your YAML configuration in the global configuration page of Jenkins.
 
- Manage Jenkins -> Configure System -> Global Properties Configuration
+ Manage Jenkins -> Global YAML Configuration
 
-![Global Properties Configuration](docs/images/configuration.png)
+![Global Properties Configuration Tab](docs/images/config_tab.png)
+![Global Properties Configurations](docs/images/configuration_example.png)
 
 Then, you can access the configuration in your pipeline or freestyle job.
+
+Also, you can configure who will have access to the Global YAML Configuration page.
+
+ Manage Jenkins -> Configure Global Security
+
+![Global Properties Configuration Tab](docs/images/matrix_based_permissions.png)
+
+Using plugin https://plugins.jenkins.io/matrix-auth/ you can configure permissions for specific users or groups to access the Global YAML Configuration page.
+In case if user has no access to manage Jenkins, there is still ability to view YAML conifgurations (if view permission on YAML Configurations is granted).
+To view configuration just visit the following URL: `<jenkins_url>/manage/globalyamlconfiguration/`
 
 ### Usage
 

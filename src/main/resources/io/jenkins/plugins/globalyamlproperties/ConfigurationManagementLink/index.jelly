@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <l:layout permission="${it.VIEW_CONFIG}" norefresh="true" title="${%section.title}">
+        <l:main-panel>
+            <h1>
+                ${%section.title}
+            </h1>
+            <f:form name="configs" method="post" action="configure">
+                <f:section title="${%section.title}">
+                    <f:repeatable items="${it.configuration.configs}" var="configs" header="${%field.header}" minimum="0" add="${%field.add}">
+                        <table width="100%">
+                            <f:entry title="${%ConfigName}" field="configs.name" >
+                                <f:textbox value="${configs.name}" checkUrl="'checkName?value='+escape(this.value)"/>
+                            </f:entry>
+                            <f:entry title="${%YamlConfig}" field="configs.yamlConfig">
+                                <f:textarea value="${configs.yamlConfig}" checkUrl="'checkYamlConfig?value='+escape(this.value)"/>
+                            </f:entry>
+                            <f:entry title="${%Category}" field="config.category">
+                                <f:textbox value="${configs.category}"/>
+                            </f:entry>
+                            <f:entry title="">
+                                <div align="right"><f:repeatableDeleteButton/></div>
+                            </f:entry>
+                        </table>
+                    </f:repeatable>
+                </f:section>
+                <f:submit value="Save"/>
+            </f:form>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
