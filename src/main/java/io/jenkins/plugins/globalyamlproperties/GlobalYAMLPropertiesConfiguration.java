@@ -2,34 +2,22 @@ package io.jenkins.plugins.globalyamlproperties;
 
 import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.model.AbstractDescribableImpl;
-import hudson.model.Describable;
-import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.verb.POST;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * Example of Jenkins global configuration.
  */
 @Extension
 public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration implements Serializable {
-    private static final Logger LOGGER = Logger.getLogger(GlobalYAMLPropertiesConfiguration.class.getName());
+
     /** @return the singleton instance */
     public static GlobalYAMLPropertiesConfiguration get() {
         return ExtensionList.lookupSingleton(GlobalYAMLPropertiesConfiguration.class);
