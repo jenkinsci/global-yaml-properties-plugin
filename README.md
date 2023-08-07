@@ -51,6 +51,7 @@ Also, you can configure who will have access to the Global YAML Configuration pa
 Using plugin https://plugins.jenkins.io/matrix-auth/ you can configure permissions for specific users or groups to access the Global YAML Configuration page.
 In case if user has no access to manage Jenkins, there is still ability to view YAML conifgurations (if view permission on YAML Configurations is granted).
 To view configuration just visit the following URL: `<jenkins_url>/manage/globalyamlconfiguration/`
+By default, only Administrators have read/edit access to the Global YAML Configuration page.
 
 ### Usage
 
