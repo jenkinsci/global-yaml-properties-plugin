@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:section title="Local YAML Configuration">
+        <f:entry title="${%YamlConfig}" field="yamlConfiguration">
+            <f:checkbox id="enableReadOnly" name="enableReadOnly" checked="true"
+                        title="ReadOnly" tooltip="${%Enable or disable read-only for config below}" />
+            <f:description>Check to enable edits on text area below</f:description>
+            <f:textarea name="yamlConfiguration" codemirror-mode="yaml" codemirror-config="mode: 'text/x-yaml', readOnly: true, lineNumbers: true, lineWrapping: true" value="${it.yamlConfiguration}"/>
+            <script type="text/javascript">
+                document.addEventListener("DOMContentLoaded", function() {
+                var checkbox = document.querySelector('#enableReadOnly');
+                checkbox.addEventListener('change', function() {
+                var textarea = document.querySelector('textarea[name="yamlConfiguration"]');
+                var cm = textarea.nextSibling.CodeMirror;
+                var isReadOnly = cm.getOption('readOnly');
+                cm.setOption('readOnly', !isReadOnly);
+                });
+                });
+            </script>
+        </f:entry>
+    </f:section>
+</j:jelly>
