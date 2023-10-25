@@ -3,20 +3,47 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <f:section title="${%section.title}">
+        <f:checkbox id="enableReadOnly" name="enableReadOnly" checked="true"
+                    title="ReadOnly" tooltip="${%config.checkbox.tooltip}" />
+        <f:description>"${%config.description}"</f:description>
         <f:entry title="${%config.title}" field="yamlConfiguration">
-            <f:checkbox id="enableReadOnly" name="enableReadOnly" checked="true"
-                        title="ReadOnly" tooltip="${%config.checkbox.tooltip}" />
-            <f:description>"${%config.description}"</f:description>
             <f:textarea name="yamlConfiguration" codemirror-mode="yaml" codemirror-config="mode: 'text/x-yaml', readOnly: true, lineNumbers: true, lineWrapping: true" value="${it.yamlConfiguration}"/>
+<!--            <script type="text/javascript">-->
+<!--                document.addEventListener("DOMContentLoaded", function() {-->
+<!--                var checkbox = document.querySelector('#enableReadOnly');-->
+<!--                checkbox.addEventListener('change', function() {-->
+<!--                var textarea = document.querySelector('textarea[name="yamlConfiguration"]');-->
+<!--                var cm = textarea.nextSibling.CodeMirror;-->
+<!--                var isReadOnly = cm.getOption('readOnly');-->
+<!--                cm.setOption('readOnly', !isReadOnly);-->
+<!--                });-->
+<!--                });-->
+<!--            </script>-->
             <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", function() {
+                var configForm = document.forms['config']; // This usually targets the job configuration form in Jenkins
                 var checkbox = document.querySelector('#enableReadOnly');
+
                 checkbox.addEventListener('change', function() {
                 var textarea = document.querySelector('textarea[name="yamlConfiguration"]');
                 var cm = textarea.nextSibling.CodeMirror;
                 var isReadOnly = cm.getOption('readOnly');
                 cm.setOption('readOnly', !isReadOnly);
                 });
+
+                if (configForm) {
+                configForm.addEventListener('submit', function(event) {
+                var errorDivs = document.querySelectorAll('div.error');
+                var hasVisibleErrors = Array.from(errorDivs).some(function(div) {
+                return div.textContent.trim().toLowerCase().includes("config");
+                });
+
+                if (hasVisibleErrors) {
+                event.preventDefault();
+                alert('Form validation failed. Please correct the errors and try again.');
+                }
+                });
+                }
                 });
             </script>
         </f:entry>

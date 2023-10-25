@@ -11,6 +11,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import net.sf.json.JSONObject;
+import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.Serializable;
@@ -58,6 +59,7 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
             return new PipelineYAMLJobProperty(yamlConfiguration);
         }
 
+        @POST
         @SuppressWarnings("unused")
         public FormValidation doCheckYamlConfiguration(@QueryParameter String value) {
             return ConfigValidator.validateYamlConfig(value);

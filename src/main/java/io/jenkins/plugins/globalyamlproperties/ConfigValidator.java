@@ -32,7 +32,7 @@ public class ConfigValidator {
             return FormValidation.error("Config is not a valid YAML file");
         } catch (GlobalYAMLPropertiesConfigurationException e) {
             return FormValidation.error(
-                    "Specified YAML is valid, but root element is not a Map. Please, use key-value format for root element");
+                    "Specified YAML config is valid, but root element is not a Map. Please, use key-value format for root element");
         }
 
         return FormValidation.ok("YAML config is valid");

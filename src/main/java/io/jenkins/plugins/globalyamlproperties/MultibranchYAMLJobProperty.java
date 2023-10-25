@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.Serializable;
@@ -57,6 +58,7 @@ public class MultibranchYAMLJobProperty extends AbstractFolderProperty<WorkflowM
         }
 
         @SuppressWarnings("unused")
+        @POST
         public FormValidation doCheckYamlConfiguration(@QueryParameter String value) {
             return ConfigValidator.validateYamlConfig(value);
         }
