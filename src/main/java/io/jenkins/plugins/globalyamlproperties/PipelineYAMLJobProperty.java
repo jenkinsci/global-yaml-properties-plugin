@@ -6,7 +6,9 @@ import hudson.model.AbstractProject;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
+import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import net.sf.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
@@ -53,6 +55,11 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
         public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) {
             String yamlConfiguration = formData.getString("yamlConfiguration");
             return new PipelineYAMLJobProperty(yamlConfiguration);
+        }
+
+        @SuppressWarnings("unused")
+        public FormValidation doCheckYamlConfiguration(@QueryParameter String value) {
+            return ConfigValidator.validateYamlConfig(value);
         }
 
         @NonNull

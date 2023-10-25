@@ -18,8 +18,8 @@
                             <f:entry title="${%Category}" field="configs.category">
                                 <f:textbox value="${configs.category}"/>
                             </f:entry>
-                            <f:advanced>
-                                <f:checkbox id="enableReadOnly" name="enableReadOnly" checked="true"
+                            <f:advanced title="${%advanced.text}">
+                                <f:checkbox name="enableReadOnly" checked="true"
                                             title="${%readonly.title}" tooltip="${%readonly.description}" />
                                 <f:description>${%readonly.description}</f:description>
                                 <f:entry title="${%YamlConfig}" field="configs.yamlConfig">

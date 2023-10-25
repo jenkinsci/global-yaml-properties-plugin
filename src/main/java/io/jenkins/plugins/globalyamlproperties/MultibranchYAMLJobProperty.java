@@ -4,8 +4,10 @@ import com.cloudbees.hudson.plugins.folder.AbstractFolderProperty;
 import com.cloudbees.hudson.plugins.folder.AbstractFolderPropertyDescriptor;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.util.FormValidation;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.HashMap;
@@ -15,8 +17,9 @@ public class MultibranchYAMLJobProperty extends AbstractFolderProperty<WorkflowM
 
     private final String yamlConfiguration;
     private final HashMap<String, Object> parsedConfig;
+
     @DataBoundConstructor
-    public MultibranchYAMLJobProperty(Boolean enableEdits, String yamlConfiguration) {
+    public MultibranchYAMLJobProperty(String yamlConfiguration) {
         this.yamlConfiguration = yamlConfiguration;
         Yaml parser = new Yaml();
         parsedConfig = parser.load(yamlConfiguration);
@@ -37,6 +40,11 @@ public class MultibranchYAMLJobProperty extends AbstractFolderProperty<WorkflowM
         @Override
         public String getDisplayName() {
             return "YAML Configuration";
+        }
+
+        @SuppressWarnings("unused")
+        public FormValidation doCheckYamlConfiguration(@QueryParameter String value) {
+            return ConfigValidator.validateYamlConfig(value);
         }
     }
 }
