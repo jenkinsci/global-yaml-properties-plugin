@@ -13,12 +13,13 @@ import org.kohsuke.stapler.StaplerRequest;
 import net.sf.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> {
+public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> implements Serializable {
     private final String yamlConfiguration;
-    private final HashMap<String, Object> parsedConfig;
+    private final transient HashMap<String, Object> parsedConfig;
 
     @DataBoundConstructor
     public PipelineYAMLJobProperty(String yamlConfiguration) {

@@ -8,24 +8,38 @@ import hudson.util.FormValidation;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MultibranchYAMLJobProperty extends AbstractFolderProperty<WorkflowMultiBranchProject> {
 
-    private final String yamlConfiguration;
-    private final HashMap<String, Object> parsedConfig;
-
+    private String yamlConfiguration;
+    private Map<String, Object> parsedConfig;
     @DataBoundConstructor
-    public MultibranchYAMLJobProperty(String yamlConfiguration) {
+    public MultibranchYAMLJobProperty(Boolean enableEdits, String yamlConfiguration) {
         this.yamlConfiguration = yamlConfiguration;
+        if (yamlConfiguration.isEmpty()) {
+            this.parsedConfig = new HashMap<>();
+        } else {
+            parseYamlConfig();
+        }
+    }
+
+    private void parseYamlConfig() {
         Yaml parser = new Yaml();
         parsedConfig = parser.load(yamlConfiguration);
         parser = null;
     }
 
+    @DataBoundSetter
+    void setYamlConfiguration(String yamlConfiguration) {
+        this.yamlConfiguration = yamlConfiguration;
+        parseYamlConfig();
+    }
     public String getYamlConfiguration() {
         return yamlConfiguration;
     }
