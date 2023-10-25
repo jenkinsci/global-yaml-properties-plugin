@@ -39,8 +39,17 @@
                 // Attach event listener to parent element
                 var formElement = document.querySelector('form[name="configs"]');
 
+                // If any "error" div elements are found, prevent form submission
+                formElement.addEventListener('submit', function(event) {
+                var errorDivs = formElement.querySelectorAll('div.error');
+                if (errorDivs.length > 0) {
+                event.preventDefault();
+                alert('Form validation failed. Please correct the errors and try again.');
+                }
+                });
+
+                // Process readonly logic
                 formElement.addEventListener('change', function(e) {
-                // Check if the changed element is a checkbox with the expected name
                 if (e.target.name === 'enableReadOnly') {
                 var checkbox = e.target;
                 var closestBlock = checkbox.closest('.tbody.dropdownList-container');
