@@ -36,19 +36,22 @@
             </f:form>
             <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", function() {
-                var advancedBlocks = document.querySelectorAll('.tbody.dropdownList-container'); // Targeting blocks with the classes
+                // Attach event listener to parent element
+                var formElement = document.querySelector('form[name="configs"]');
 
-                advancedBlocks.forEach(function(block) {
-                var checkbox = block.querySelector('input[type="checkbox"]');
-                var textarea = block.querySelector('textarea');
+                formElement.addEventListener('change', function(e) {
+                // Check if the changed element is a checkbox with the expected name
+                if (e.target.name === 'enableReadOnly') {
+                var checkbox = e.target;
+                var closestBlock = checkbox.closest('.tbody.dropdownList-container');
+                var textarea = closestBlock.querySelector('textarea');
 
-                checkbox.addEventListener('change', function() {
                 if (textarea.hasAttribute('readonly')) {
                 textarea.removeAttribute('readonly');
                 } else {
                 textarea.setAttribute('readonly', 'readonly');
                 }
-                });
+                }
                 });
                 });
             </script>
