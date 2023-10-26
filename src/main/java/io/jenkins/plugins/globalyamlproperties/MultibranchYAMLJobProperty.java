@@ -20,8 +20,9 @@ public class MultibranchYAMLJobProperty extends AbstractFolderProperty<WorkflowM
 
     private String yamlConfiguration;
     private Map<String, Object> parsedConfig;
+
     @DataBoundConstructor
-    public MultibranchYAMLJobProperty(Boolean enableEdits, String yamlConfiguration) {
+    public MultibranchYAMLJobProperty(String yamlConfiguration) {
         this.yamlConfiguration = yamlConfiguration;
         if (yamlConfiguration.isEmpty()) {
             this.parsedConfig = new HashMap<>();
@@ -36,17 +37,21 @@ public class MultibranchYAMLJobProperty extends AbstractFolderProperty<WorkflowM
         parser = null;
     }
 
+    public Map<String, Object> getParsedConfig() {
+        if (parsedConfig == null) {
+            parseYamlConfig();
+        }
+        return parsedConfig;
+    }
+
     @DataBoundSetter
     void setYamlConfiguration(String yamlConfiguration) {
         this.yamlConfiguration = yamlConfiguration;
         parseYamlConfig();
     }
+
     public String getYamlConfiguration() {
         return yamlConfiguration;
-    }
-
-    public Map<String, Object> getParsedConfig() {
-        return parsedConfig;
     }
 
     @Extension
