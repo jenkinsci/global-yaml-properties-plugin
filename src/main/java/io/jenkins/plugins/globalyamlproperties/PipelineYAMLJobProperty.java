@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> implements Serializable {
     private final String yamlConfiguration;
-    private final transient HashMap<String, Object> parsedConfig;
+    private transient HashMap<String, Object> parsedConfig;
 
     @DataBoundConstructor
     public PipelineYAMLJobProperty(String yamlConfiguration) {
@@ -35,8 +35,13 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
     }
 
     public Map<String, Object> getParsedConfig() {
+        if (parsedConfig == null) {
+            Yaml parser = new Yaml();
+            parsedConfig = parser.load(yamlConfiguration);
+        }
         return parsedConfig;
     }
+
 
     @Extension
     public static class DescriptorImpl extends JobPropertyDescriptor {

@@ -5,7 +5,6 @@ import hudson.Extension;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import io.jenkins.plugins.globalyamlproperties.GlobalYAMLPropertiesConfiguration;
 import io.jenkins.plugins.globalyamlproperties.MultibranchYAMLJobProperty;
 import io.jenkins.plugins.globalyamlproperties.PipelineYAMLJobProperty;
 import org.jenkinsci.Symbol;
@@ -14,16 +13,15 @@ import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.PluginWrapper;
 import jenkins.model.Jenkins;
-import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.*;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 public class GetLocalYAMLConfig extends Step {
 
     @DataBoundConstructor public GetLocalYAMLConfig() {
+        // Empty because step requires no parameters
     }
 
     @Override
@@ -38,26 +36,26 @@ public class GetLocalYAMLConfig extends Step {
             super(context);
         }
 
-        protected boolean isMultibranchPipeline(Object job) {
-            PluginWrapper plugin = Jenkins.getInstanceOrNull().pluginManager.getPlugin("workflow-multibranch");
-            if (plugin != null) {
-                // The Multi-Branch Project Plugin is installed
-                if (job instanceof org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject) {
-                    return true;
-                }
+        @SuppressWarnings("deprecation")
+        protected boolean isMultibranchPipeline(Job job) {
+            try {
+                PluginWrapper plugin = Jenkins.getInstance().pluginManager.getPlugin("workflow-multibranch");
+                return plugin != null && (job.getParent() instanceof org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject);
+            } catch (Exception e) {
+                return false;
             }
-            return false;
         }
+
         @Override
+        @SuppressWarnings("deprecation")
         protected Map<String, Object> run() throws Exception {
             StepContext context = getContext();
-            PrintStream logger = context.get(TaskListener.class).getLogger();
-            Object job = context.get(Run.class).getParent();
+            Job job = context.get(Run.class).getParent();
 
             if (isMultibranchPipeline(job)) {
-                org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject multibranchProject = (org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject) job;
+                org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject multibranchProject = (org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject) job.getParent();
                 MultibranchYAMLJobProperty localYamlConfiguration = multibranchProject.getProperties().get(MultibranchYAMLJobProperty.class);
-                return localYamlConfiguration.getParsedConfig();
+                return deepCopyMap(localYamlConfiguration.getParsedConfig());
             } else {
                 WorkflowJob pipelineJob = (WorkflowJob) job;
                 PipelineYAMLJobProperty localYamlConfiguration = pipelineJob.getProperty(PipelineYAMLJobProperty.class);
