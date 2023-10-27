@@ -38,7 +38,8 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
     public String getYamlConfiguration() {
         return yamlConfiguration;
     }
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+
+    private void readObject(@NonNull ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         Yaml parser = new Yaml();
         this.parsedConfig = parser.load(yamlConfiguration);
