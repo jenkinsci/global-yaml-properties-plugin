@@ -19,7 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> implements Serializable {
+
     private final String yamlConfiguration;
+    @SuppressWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     private transient HashMap<String, Object> parsedConfig;
 
     @DataBoundConstructor
@@ -76,4 +78,6 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
             return "Custom YAML Configuration";
         }
     }
+
+    private static final long serialVersionUID = 1L;
 }
