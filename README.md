@@ -2,10 +2,11 @@
 
 ## Introduction
 
-The Global YAML Properties Plugin is a universal extension for Jenkins that enhances the Manage Jenkins page by adding a Global YAML Configuration page.
+The Global YAML Properties Plugin is a universal extension for Jenkins that enhances Jenkins configuration by adding a Global YAML Configuration page.
 This page allows users to define global properties in YAML format, which is then parsed into a HashMap and can be accessed throughout specific build step.
+The same mechanism is used for Local YAML Configuration, but it is defined in the project's configuration page.
 
-The plugin simplifies the management of global properties and configurations by centralizing them within Jenkins. You can define key-value pairs, nested structures, and arrays using YAML, making it easier to express complex relationships.
+Plugin simplifies the management of global properties and configurations by centralizing them within Jenkins. You can define key-value pairs, nested structures, and arrays using YAML, making it easier to express complex relationships.
 
 Once the properties are saved, they are automatically parsed into a HashMap, enabling easy access throughout your Jenkins pipelines or jobs. This promotes dynamic and customizable workflows.
 
@@ -33,6 +34,9 @@ Global YAML Properties Plugin allows you to define FTP address in one place and 
    In this case global properties can be nice feature for handling credential IDs.
 
 ### Configuration
+
+#### Global YAML Configuration
+
 At first, define your YAML configuration in the global configuration page of Jenkins.
 
  Manage Jenkins -> Global YAML Configuration
@@ -53,12 +57,23 @@ In case if user has no access to manage Jenkins, there is still ability to view 
 To view configuration just visit the following URL: `<jenkins_url>/manage/globalyamlconfiguration/`
 By default, only Administrators have read/edit access to the Global YAML Configuration page.
 
+#### Local YAML Configuration
+
+Local YAML Configuration is a configuration that is defined in the project's configuration page. Only people
+who have access to project's configuration can view or edit Local YAML Configuration.
+
+![Global Properties Configuration Tab](docs/images/local_yaml_configuration.png)
+
+Local YAML Configuration can also be defined for multibranch pipeline jobs. In this case, Local YAML Configuration
+will be defined in the configuration of the multibranch pipeline job, not in the configuration of the branch job.
+
 ### Usage
 
 Step `getGlobalYAMLProperties` without arguments returns HashMap object which is parsed from default YAML configuration.
 Default YAML configuration is the first configuration in the list of Global Configuration.
+Step `getLocalYAMLProperties` without arguments returns HashMap object which is parsed from project's YAML configuration.
 
-Here is pipeline example which explains to access the configuration:
+Here is pipeline example which explains access to the configuration:
 ```groovy
 def myProperties = getGlobalYAMLProperties()
 String message = "Message for:\n${myProperties['devopsTeam'].join('\n')}\n"
@@ -91,6 +106,7 @@ Here are complete steps definitions:
 | getGlobalYAMLConfigNames           | Get names of all defined configurations                                                                           |                                |
 | getGlobalYAMLCategories            | Get all defined categories                                                                                        |                                |
 | getGlobalYAMLConfigNamesByCategory | Get all config names that belongs to category                                                                     | [String] category              |
+| getLocalYAMLProperties             | Get project's YAML configuration in LinkedHashMap format.                                                         |                                |
 
 ## Issues
 
@@ -98,7 +114,9 @@ Report issues and enhancements in the [Jenkins issue tracker](https://issues.jen
 
 ## Contributing
 
-Refer to our [contribution guidelines](CONTRIBUTING.md)
+1. Fork repository
+2. Create PR accordingly to template into source repository
+3. Wait for review
 
 ## LICENSE
 

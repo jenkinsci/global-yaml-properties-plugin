@@ -4,6 +4,8 @@ import hudson.model.Label;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory;
+import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import org.junit.Test;
 import org.junit.Rule;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -11,6 +13,9 @@ import org.jvnet.hudson.test.JenkinsRule;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class GlobalYAMLPropertiesConfigurationTest {
 
@@ -193,6 +198,36 @@ public class GlobalYAMLPropertiesConfigurationTest {
         jenkins.assertLogContains(name + "0", completedBuild);
         jenkins.assertLogContains(name + "1", completedBuild);
         jenkins.assertLogContains(name + "2", completedBuild);
+    }
+
+    @Test
+    public void testMultibranchJobConfiguration() throws Exception {
+        // Create a MultiBranch Pipeline
+        WorkflowMultiBranchProject mp = jenkins.jenkins.createProject(WorkflowMultiBranchProject.class, "my-multi-branch-project");
+
+        // Setup the branch project factory (how Jenkins should create pipeline jobs for branches)
+        mp.setProjectFactory(new WorkflowBranchProjectFactory());
+
+        // Adding a property to the multibranch pipeline
+        mp.addProperty(new MultibranchYAMLJobProperty(yamlConfig)); // Replace with your actual property and value
+
+        MultibranchYAMLJobProperty property = mp.getProperties().get(MultibranchYAMLJobProperty.class);
+        assertNotNull(property);
+    }
+
+    @Test
+    public void testMultibranchJobConfigurationParsing() throws Exception {
+        // Create a MultiBranch Pipeline
+        WorkflowMultiBranchProject mp = jenkins.jenkins.createProject(WorkflowMultiBranchProject.class, "my-multi-branch-project");
+
+        // Setup the branch project factory (how Jenkins should create pipeline jobs for branches)
+        mp.setProjectFactory(new WorkflowBranchProjectFactory());
+
+        // Adding a property to the multibranch pipeline
+        mp.addProperty(new MultibranchYAMLJobProperty(yamlConfig)); // Replace with your actual property and value
+
+        MultibranchYAMLJobProperty property = mp.getProperties().get(MultibranchYAMLJobProperty.class);
+        assertEquals(1.0, property.getParsedConfig().get("version"));
     }
 
     @Test

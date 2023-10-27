@@ -39,6 +39,7 @@ public class ConfigurationManagementLink extends ManagementLink {
     }
 
     @POST
+    @SuppressWarnings("unused")
     public HttpResponse doConfigure(StaplerRequest req, StaplerResponse rsp) throws ServletException {
         if (!Jenkins.get().hasPermission(UPDATE_CONFIG)) {
             return HttpResponses.errorWithoutStack(403, "You have no permissions to update global configuration");
@@ -50,19 +51,16 @@ public class ConfigurationManagementLink extends ManagementLink {
 
         JSONObject json = req.getSubmittedForm();
 
-        Object configs = json.get("config");
+        Object configs = json.get("configs");
         List<JSONObject> configList = new ArrayList<>();
-
         if(configs instanceof net.sf.json.JSONArray) {
-            net.sf.json.JSONArray configsArray = json.getJSONArray("config");
+            net.sf.json.JSONArray configsArray = json.getJSONArray("configs");
             for (Object config : configsArray) {
                 configList.add((JSONObject) config);
             }
-        } else if(configs instanceof JSONObject){
+        } else if(configs instanceof JSONObject) {
             configList.add((JSONObject)configs);
         }
-
-
         for (JSONObject obj : configList) {
             if (obj == null) continue;
 
