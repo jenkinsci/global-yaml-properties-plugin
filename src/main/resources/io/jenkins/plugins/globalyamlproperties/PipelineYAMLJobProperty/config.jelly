@@ -5,20 +5,9 @@
     <f:section title="${%section.title}">
         <f:checkbox id="enableReadOnly" name="enableReadOnly" checked="true"
                     title="ReadOnly" tooltip="${%config.checkbox.tooltip}" />
-        <f:description>"${%config.description}"</f:description>
+        <f:description>${%config.description}</f:description>
         <f:entry title="${%config.title}" field="yamlConfiguration">
             <f:textarea name="yamlConfiguration" codemirror-mode="yaml" codemirror-config="mode: 'text/x-yaml', readOnly: true, lineNumbers: true, lineWrapping: true" value="${it.yamlConfiguration}"/>
-<!--            <script type="text/javascript">-->
-<!--                document.addEventListener("DOMContentLoaded", function() {-->
-<!--                var checkbox = document.querySelector('#enableReadOnly');-->
-<!--                checkbox.addEventListener('change', function() {-->
-<!--                var textarea = document.querySelector('textarea[name="yamlConfiguration"]');-->
-<!--                var cm = textarea.nextSibling.CodeMirror;-->
-<!--                var isReadOnly = cm.getOption('readOnly');-->
-<!--                cm.setOption('readOnly', !isReadOnly);-->
-<!--                });-->
-<!--                });-->
-<!--            </script>-->
             <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", function() {
                 var configForm = document.forms['config']; // This usually targets the job configuration form in Jenkins
