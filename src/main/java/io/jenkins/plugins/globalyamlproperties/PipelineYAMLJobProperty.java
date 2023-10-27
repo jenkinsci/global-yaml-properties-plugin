@@ -18,10 +18,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+
+@SuppressWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
 public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> implements Serializable {
 
     private final String yamlConfiguration;
-    @SuppressWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
     private transient HashMap<String, Object> parsedConfig;
 
     @DataBoundConstructor
