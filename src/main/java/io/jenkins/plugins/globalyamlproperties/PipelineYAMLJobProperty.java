@@ -14,6 +14,8 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,12 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
 
     public String getYamlConfiguration() {
         return yamlConfiguration;
+    }
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        Yaml parser = new Yaml();
+        this.parsedConfig = parser.load(yamlConfiguration);
+        parser = null;
     }
 
     public Map<String, Object> getParsedConfig() {
