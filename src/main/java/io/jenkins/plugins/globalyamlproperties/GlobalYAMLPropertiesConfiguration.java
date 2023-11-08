@@ -9,6 +9,7 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -24,6 +25,7 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
     }
 
     private List<Config> configs = new ArrayList<>();
+    private int refreshInterval = 60;
 
     public GlobalYAMLPropertiesConfiguration() {
         // When Jenkins is restarted, load any saved configuration from disk.
@@ -51,7 +53,13 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
         return configNames;
     }
 
-    public List<Config> getConfigsByCategory(String category) throws GlobalYAMLPropertiesConfigurationException {
+    void refreshConfiguration() throws IOException {
+        for (Config config : configs) {
+            config.refreshConfiguration();
+        }
+    }
+
+    public List<Config> getConfigsByCategory(String category) {
         List<Config> collectedConfigs = new ArrayList<>();
         for (Config config : configs) {
             if (config.getCategory().equals(category)) {
@@ -61,7 +69,7 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
         return collectedConfigs;
     }
 
-    public List<String> getConfigNamesByCategory(String category) throws GlobalYAMLPropertiesConfigurationException {
+    public List<String> getConfigNamesByCategory(String category) {
         List<String> collectedConfigNames = new ArrayList<>();
         for (Config config : configs) {
             if (config.getCategory().equals(category)) {
@@ -92,21 +100,29 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
         save();
     }
 
+    @DataBoundSetter
+    public void setRefreshInterval(int refreshInterval) {
+        this.refreshInterval = refreshInterval;
+        save();
+    }
+
+    public int getRefreshInterval() {
+        return this.refreshInterval;
+    }
+
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
-        if (!json.has("configs")) {
+        String configsField = "configs";
+
+        if (!json.has(configsField)) {
             return true;
         }
-        String configNameField = "name";
-        String yamlConfigField = "yamlConfig";
 
-        Config.DescriptorImpl configDescriptor = Jenkins.get().getDescriptorByType(Config.DescriptorImpl.class);
-
-        Object configs = json.get("configs");
+        Object configs = json.get(configsField);
         List<JSONObject> configList = new ArrayList<>();
 
         if(configs instanceof net.sf.json.JSONArray) {
-            net.sf.json.JSONArray configsArray = json.getJSONArray("configs");
+            net.sf.json.JSONArray configsArray = json.getJSONArray(configsField);
             for (Object config : configsArray) {
                 configList.add((JSONObject) config);
             }
@@ -114,33 +130,9 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
             configList.add((JSONObject)configs);
         }
 
-
-        for (JSONObject obj : configList) {
-            if (obj == null) continue;
-
-            if (!obj.has(configNameField) || !(obj.get(configNameField) instanceof String)) {
-                throw new FormException("Global YAML Configuration is not valid: Config name must be a string", configNameField);
-            }
-
-            // If the "yamlConfig" key does not exist or is not a string, validation fails
-            if (!obj.has(yamlConfigField) || !(obj.get(yamlConfigField) instanceof String)) {
-                throw new FormException("YAML config must be a string", yamlConfigField);
-            }
-
-            // Perform the validation
-            FormValidation nameValidation = configDescriptor.doCheckName(obj.getString(configNameField));
-            if (nameValidation.kind != FormValidation.Kind.OK) {
-                throw new FormException("Global YAML Configuration is not valid: " + nameValidation.getMessage(), configNameField);
-            }
-
-            FormValidation yamlConfigValidation = configDescriptor.doCheckYamlConfig(obj.getString(yamlConfigField));
-            if (yamlConfigValidation.kind == FormValidation.Kind.ERROR) {
-                throw new FormException("Global YAML Configuration [" + obj.get(configNameField) + "] is not valid: " + yamlConfigValidation.getMessage(), yamlConfigField);
-            }
-        }
-
         // If no exceptions were thrown during validation, bind the JSON to this instance
         req.bindJSON(this, json);
+        save();
 
         return true;
     }

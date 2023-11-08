@@ -7,6 +7,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.globalyamlproperties.MultibranchYAMLJobProperty;
 import io.jenkins.plugins.globalyamlproperties.PipelineYAMLJobProperty;
+import io.jenkins.plugins.globalyamlproperties.Utils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.steps.*;
@@ -36,10 +37,9 @@ public class GetLocalYAMLConfig extends Step {
             super(context);
         }
 
-        @SuppressWarnings("deprecation")
         protected boolean isMultibranchPipeline(Job job) {
             try {
-                PluginWrapper plugin = Jenkins.getInstance().pluginManager.getPlugin("workflow-multibranch");
+                PluginWrapper plugin = Jenkins.get().pluginManager.getPlugin("workflow-multibranch");
                 return plugin != null && (job.getParent() instanceof org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject);
             } catch (Exception e) {
                 return false;
@@ -47,7 +47,6 @@ public class GetLocalYAMLConfig extends Step {
         }
 
         @Override
-        @SuppressWarnings("deprecation")
         protected Map<String, Object> run() throws Exception {
             StepContext context = getContext();
             Job job = context.get(Run.class).getParent();
@@ -55,22 +54,12 @@ public class GetLocalYAMLConfig extends Step {
             if (isMultibranchPipeline(job)) {
                 org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject multibranchProject = (org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject) job.getParent();
                 MultibranchYAMLJobProperty localYamlConfiguration = multibranchProject.getProperties().get(MultibranchYAMLJobProperty.class);
-                return deepCopyMap(localYamlConfiguration.getParsedConfig());
+                return Utils.deepCopyMap(localYamlConfiguration.getParsedConfig());
             } else {
                 WorkflowJob pipelineJob = (WorkflowJob) job;
                 PipelineYAMLJobProperty localYamlConfiguration = pipelineJob.getProperty(PipelineYAMLJobProperty.class);
-                return deepCopyMap(localYamlConfiguration.getParsedConfig());
+                return Utils.deepCopyMap(localYamlConfiguration.getParsedConfig());
             }
-        }
-
-        static Map<String, Object> deepCopyMap(Map<String, Object> orig) throws IOException, ClassNotFoundException {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(orig);
-            oos.flush();
-            ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bin);
-            return (Map<String, Object>) ois.readObject();
         }
     }
 

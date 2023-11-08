@@ -10,8 +10,13 @@
             </h1>
             <f:form name="configs" method="post" action="configure">
                 <f:section title="${%section.title}">
+                    <f:entry title="${%fetch.interval}" field="it.configuration.refreshInterval">
+                        <f:description>${%fetch.interval.description}</f:description>
+                        <f:number min="1" max="50000" value="${it.configuration.refreshInterval}" default="60"/>
+                    </f:entry>
                     <f:repeatable items="${it.configuration.configs}" var="configs" header="${%field.header}" minimum="0" add="${%field.add}">
                         <table width="100%">
+                            <br></br>
                             <f:entry title="${%ConfigName}" field="configs.name" >
                                 <f:textbox value="${configs.name}" checkUrl="'checkName?value='+escape(this.value)"/>
                             </f:entry>
@@ -19,12 +24,7 @@
                                 <f:textbox value="${configs.category}"/>
                             </f:entry>
                             <f:advanced title="${%advanced.text}">
-                                <f:checkbox name="enableReadOnly" checked="true"
-                                            title="${%readonly.title}" tooltip="${%readonly.description}" />
-                                <f:description>${%readonly.description}</f:description>
-                                <f:entry title="${%YamlConfig}" field="configs.yamlConfig">
-                                    <f:textarea readonly='readonly' style="max-height: 700px; overflow-y: auto; resize: vertical;" value="${configs.yamlConfig}" checkUrl="'checkYamlConfig?value='+escape(this.value)"/>
-                                </f:entry>
+                                <f:dropdownDescriptorSelector field="configs.configSource" default="${configs.configSource}" descriptors="${it.applicableConfigSources}" title="Config Source"/>
                             </f:advanced>
                             <f:entry title="">
                                 <div align="right"><f:repeatableDeleteButton/></div>
@@ -48,18 +48,18 @@
                 }
                 });
 
-                // Process readonly logic
+                // Process readonly logic for textareas with CodeMirror
                 formElement.addEventListener('change', function(e) {
                 if (e.target.name === 'enableReadOnly') {
                 var checkbox = e.target;
                 var closestBlock = checkbox.closest('.tbody.dropdownList-container');
-                var textarea = closestBlock.querySelector('textarea');
 
+                var textarea = closestBlock.querySelector('textarea[name="yamlConfig"]');
                 if (textarea.hasAttribute('readonly')) {
-                textarea.removeAttribute('readonly');
+                    textarea.removeAttribute('readonly');
                 } else {
-                textarea.setAttribute('readonly', 'readonly');
-                }
+                    textarea.setAttribute('readonly', 'readonly');
+                    }
                 }
                 });
                 });

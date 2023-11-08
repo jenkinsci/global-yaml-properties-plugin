@@ -42,9 +42,31 @@ At first, define your YAML configuration in the global configuration page of Jen
  Manage Jenkins -> Global YAML Configuration
 
 ![Global Properties Configuration Tab](docs/images/config_tab.png)
-![Global Properties Configurations](docs/images/configuration_example.png)
+![Global Properties Configuration Manual](docs/images/manual_configuration_source.png)
+![Global Properties Configuration GitHub](docs/images/github_configuration_source.png)
 
-Then, you can access the configuration in your pipeline or freestyle job.
+There is two types of configuration sources:
+ - **Manual**: manually defined YAML configuration
+ - **GitHub**: YAML configuration from GitHub repository
+
+To use GitHub configuration, you need to specify the following parameters:
+  - **Repository Name**: name of the repository
+  - **Branch/Commit ref**: Any GitHub reference (branch, tag, or commit SHA) that uniquely identifies the commit
+  - **Path to YAML file**: path to YAML file in repository
+  - **[GiHub App Credentials](https://github.com/jenkinsci/github-branch-source-plugin/blob/master/docs/github-app.adoc)**: GitHub App credentials to access repository
+
+To validate GitHub configuration source, click **Obtain Configuration** button. If validation is successful, you will see configuration that
+will be obtained from source and parsed.
+
+When using GitHub configuration source, you may want to specify **Refresh Interval** parameter to not overload GitHub API.
+It can be done at top of the page. Accepted values are between 1 and 50000 (minutes).
+
+![Global Properties Configuration GitHub Fetch Interval](docs/images/fetch_interval.png)
+
+Please note, that GitHub configuration also fetched every time when you click **Save** button on the page.
+When commit hash is specified as reference, configuration will not be fetched periodically to save API Request limit usage.
+
+Now, you can access the configuration in your pipeline or freestyle job.
 
 Also, you can configure who will have access to the Global YAML Configuration page.
 

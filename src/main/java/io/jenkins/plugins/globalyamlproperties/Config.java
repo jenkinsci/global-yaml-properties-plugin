@@ -1,27 +1,21 @@
 package io.jenkins.plugins.globalyamlproperties;
 
+import hudson.DescriptorExtensionList;
 import hudson.Extension;
-import hudson.ExtensionList;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
-import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
-import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.*;
+import org.kohsuke.stapler.verb.GET;
 import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.YAMLException;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 public class Config extends AbstractDescribableImpl<Config> implements Serializable {
@@ -30,35 +24,34 @@ public class Config extends AbstractDescribableImpl<Config> implements Serializa
     private String yamlConfig;
     private String category;
     private HashMap<String, Object> configMap = new HashMap<>();
+    private ConfigSource configSource;
 
     @DataBoundConstructor
-    public Config(String name, String yamlConfig) {
+    public Config(String name, String category, ConfigSource configSource) {
         this.name = name;
-        this.yamlConfig = yamlConfig;
-        if (yamlConfig.isEmpty()) {
-            this.configMap = new HashMap<>();
-        } else {
-            parseYamlConfig();
-        }
-    }
-
-    public void setYamlConfig(String yamlConfig) {
-        this.yamlConfig = yamlConfig;
-        parseYamlConfig();
-    }
-
-    private void parseYamlConfig() {
-        Yaml parser = new Yaml();
-        this.configMap = parser.load(yamlConfig);
-    }
-
-    public String getCategory() {
-        return category;
+        this.configSource = configSource;
+        this.category = category;
+        this.yamlConfig = this.configSource.getYamlConfig();
+        parseConfiguration();
     }
 
     @DataBoundSetter
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    @DataBoundSetter
+    public void setConfigSource(ConfigSource configSource) {
+        this.configSource = configSource;
+    }
+
+    @DataBoundSetter
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCategory() {
+        return category;
     }
 
     public String getName() {
@@ -69,8 +62,32 @@ public class Config extends AbstractDescribableImpl<Config> implements Serializa
         return yamlConfig;
     }
 
+    public ConfigSource getConfigSource() {
+        return configSource;
+    }
+
     public Map<String, Object> getConfigMap() {
         return this.configMap;
+    }
+
+    public void refreshConfiguration() throws IOException {
+        Logger logger = Logger.getLogger(Config.class.getName());
+        logger.info("Refreshing configuration for " + this.name);
+        if (getConfigSource() instanceof ConfigSourceSCM) {
+            ConfigSourceSCM configSourceSCM = (ConfigSourceSCM) getConfigSource();
+            configSourceSCM.fetchConfiguration();
+        }
+        parseConfiguration();
+    }
+
+    public void parseConfiguration() {
+        Yaml parser = new Yaml();
+        this.yamlConfig = configSource.getYamlConfig();
+        if (this.yamlConfig == null || this.yamlConfig.isEmpty()) {
+            this.configMap = new HashMap<>();
+        } else {
+            this.configMap = parser.load(yamlConfig);
+        }
     }
 
     @Extension
@@ -79,6 +96,12 @@ public class Config extends AbstractDescribableImpl<Config> implements Serializa
         @POST
         public FormValidation doCheckName(@QueryParameter String value) {
             return ConfigValidator.validateName(value);
+        }
+
+        @POST
+        @GET
+        public DescriptorExtensionList<ConfigSource, Descriptor<ConfigSource>> getApplicableConfigSources() {
+            return Jenkins.get().getDescriptorList(ConfigSource.class);
         }
 
         @POST
