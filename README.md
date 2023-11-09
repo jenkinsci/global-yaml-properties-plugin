@@ -133,7 +133,7 @@ Here are complete steps definitions:
 ## Issues
 
 Report issues and enhancements in the [Jenkins issue tracker](https://issues.jenkins-ci.org/).
-
+Do not forget to specify component as `global-yaml-properties-plugin`.
 ## Contributing
 
 1. Fork repository
