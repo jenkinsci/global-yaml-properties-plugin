@@ -4,6 +4,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.globalyamlproperties.GlobalYAMLPropertiesConfiguration;
+import io.jenkins.plugins.globalyamlproperties.Utils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -64,17 +65,7 @@ public class GetGlobalYAMLConfig extends Step {
             if (globalPropertiesConfigMap.isEmpty()) {
                 logger.println("[GetGlobalProperties] Warning: Configuration is empty");
             }
-            return deepCopyMap(globalPropertiesConfigMap);
-        }
-
-        static Map<String, Object> deepCopyMap(Map<String, Object> orig) throws IOException, ClassNotFoundException {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(orig);
-            oos.flush();
-            ByteArrayInputStream bin = new ByteArrayInputStream(bos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bin);
-            return (Map<String, Object>) ois.readObject();
+            return Utils.deepCopyMap(globalPropertiesConfigMap);
         }
     }
 

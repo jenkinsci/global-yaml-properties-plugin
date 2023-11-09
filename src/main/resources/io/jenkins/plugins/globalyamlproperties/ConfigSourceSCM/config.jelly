@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+        <f:entry title="Repository name" field="repositoryName">
+            <f:textbox value="${instance.repositoryName}"/>
+        </f:entry>
+        <f:entry title="Repository owner" field="repositoryOwner">
+            <f:textbox value="${instance.repositoryOwner}"/>
+        </f:entry>
+        <f:entry title="Branch/Commit ref" field="ref">
+            <f:textbox value="${instance.ref}"/>
+        </f:entry>
+        <f:entry title="GitHub App Credentials ID" field="credentialsId">
+            <f:select default="${instance.credentialsId}" items="${descriptor.applicableCredentials}" />
+        </f:entry>
+        <f:entry title="Path to YAML config" field="path">
+            <f:textbox value="${instance.path}"/>
+        </f:entry>
+        <f:validateButton
+            title="Try to obtain configuration" progress="Obtaining..."
+            method="validate" with="repositoryName,repositoryOwner,ref,credentialsId,path" />
+</j:jelly>

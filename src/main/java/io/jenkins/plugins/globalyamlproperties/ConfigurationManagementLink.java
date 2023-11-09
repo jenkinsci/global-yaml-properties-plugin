@@ -1,7 +1,7 @@
 package io.jenkins.plugins.globalyamlproperties;
 
 import hudson.Extension;
-import hudson.model.ManagementLink;
+import hudson.model.*;
 import hudson.security.Permission;
 import hudson.security.PermissionGroup;
 import hudson.security.PermissionScope;
@@ -13,8 +13,10 @@ import org.kohsuke.stapler.verb.POST;
 import org.springframework.lang.NonNull;
 
 import javax.servlet.ServletException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Extension
 public class ConfigurationManagementLink extends ManagementLink {
@@ -41,16 +43,18 @@ public class ConfigurationManagementLink extends ManagementLink {
     @POST
     @SuppressWarnings("unused")
     public HttpResponse doConfigure(StaplerRequest req, StaplerResponse rsp) throws ServletException {
+
         if (!Jenkins.get().hasPermission(UPDATE_CONFIG)) {
             return HttpResponses.errorWithoutStack(403, "You have no permissions to update global configuration");
         }
+
         // Get logger for ConfigurationManagementLink
         GlobalYAMLPropertiesConfiguration globalConfig = getConfiguration();
         String configNameField = "name";
         String yamlConfigField = "yamlConfig";
+        String configSourceField = "configSource";
 
         JSONObject json = req.getSubmittedForm();
-
         Object configs = json.get("configs");
         List<JSONObject> configList = new ArrayList<>();
         if(configs instanceof net.sf.json.JSONArray) {
@@ -61,33 +65,41 @@ public class ConfigurationManagementLink extends ManagementLink {
         } else if(configs instanceof JSONObject) {
             configList.add((JSONObject)configs);
         }
+
         for (JSONObject obj : configList) {
-            if (obj == null) continue;
-
-            if (!obj.has(configNameField) || !(obj.get(configNameField) instanceof String)) {
-                return HttpResponses.errorWithoutStack(400, "Global YAML Configuration is not valid: Config name must be a string");
+            HttpResponses.HttpResponseException validationError = validateConfig(obj, configNameField, configSourceField, yamlConfigField);
+            if (validationError != null) {
+                return validationError;
             }
-
-            // If the "yamlConfig" key does not exist or is not a string, validation fails
-            if (!obj.has(yamlConfigField) || !(obj.get(yamlConfigField) instanceof String)) {
-                return HttpResponses.errorWithoutStack(400, "YAML config must be a string");
-            }
-
-            // Perform the validation
-            FormValidation nameValidation = ConfigValidator.validateName(obj.getString(configNameField));
-            if (nameValidation.kind != FormValidation.Kind.OK) {
-                return HttpResponses.errorWithoutStack(400, "Global YAML Configuration is not valid: " + nameValidation.getMessage());
-            }
-
-            FormValidation yamlConfigValidation = ConfigValidator.validateYamlConfig(obj.getString(yamlConfigField));
-            if (yamlConfigValidation.kind == FormValidation.Kind.ERROR) {
-                return HttpResponses.errorWithoutStack(400, "Global YAML Configuration [" + obj.get(configNameField) + "] is not valid: " + yamlConfigValidation.getMessage());}
         }
 
         // If no exceptions were thrown during validation, bind the JSON to this instance
         req.bindJSON(globalConfig, json);
+        try {
+            globalConfig.refreshConfiguration();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         globalConfig.save();
         return HttpResponses.redirectTo(".");
+    }
+
+    HttpResponses.HttpResponseException validateConfig(JSONObject config, String nameField, String configSourceField, String yamlConfigField) {
+        if (config == null) return null;
+        if (!config.has(nameField) || !(config.get(nameField) instanceof String)) {
+            return HttpResponses.errorWithoutStack(400, "Global YAML Configuration is not valid: Config name must be a string");
+        }
+        if (!config.has(configSourceField)) {
+            return HttpResponses.errorWithoutStack(400, "Global YAML Configuration is not valid: Config has no configuration source");
+        }
+        JSONObject configSource = config.getJSONObject(configSourceField);
+        if (configSource.get("stapler-class").equals(ConfigSourceManual.class.getName())) {
+            FormValidation yamlConfigValidation = ConfigValidator.validateYamlConfig(configSource.getString(yamlConfigField));
+            if (yamlConfigValidation.kind == FormValidation.Kind.ERROR) {
+                return HttpResponses.errorWithoutStack(400, "Global YAML Configuration [" + config.get(nameField) + "] is not valid: " + yamlConfigValidation.getMessage());
+            }
+        }
+        return null;
     }
 
     @POST
@@ -97,6 +109,15 @@ public class ConfigurationManagementLink extends ManagementLink {
         }
 
         return ConfigValidator.validateName(value);
+    }
+
+    public List<Descriptor<ConfigSource>> getApplicableConfigSources() {
+        Logger logger = Logger.getLogger(ConfigurationManagementLink.class.getName());
+        logger.info("getApplicableConfigSources");
+        List<Descriptor<ConfigSource>> applicableConfigSources = new ArrayList<>();
+        applicableConfigSources.add(Jenkins.get().getDescriptor(ConfigSourceSCM.class));
+        applicableConfigSources.add(Jenkins.get().getDescriptor(ConfigSourceManual.class));
+        return applicableConfigSources;
     }
 
     @POST
