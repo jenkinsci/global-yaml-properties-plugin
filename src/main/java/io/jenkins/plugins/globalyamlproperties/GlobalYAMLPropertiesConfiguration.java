@@ -118,18 +118,6 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
             return true;
         }
 
-        Object configs = json.get(configsField);
-        List<JSONObject> configList = new ArrayList<>();
-
-        if(configs instanceof net.sf.json.JSONArray) {
-            net.sf.json.JSONArray configsArray = json.getJSONArray(configsField);
-            for (Object config : configsArray) {
-                configList.add((JSONObject) config);
-            }
-        } else if(configs instanceof JSONObject){
-            configList.add((JSONObject)configs);
-        }
-
         // If no exceptions were thrown during validation, bind the JSON to this instance
         req.bindJSON(this, json);
         save();

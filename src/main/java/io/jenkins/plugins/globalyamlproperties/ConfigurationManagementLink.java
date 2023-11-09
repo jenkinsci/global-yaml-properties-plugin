@@ -43,12 +43,10 @@ public class ConfigurationManagementLink extends ManagementLink {
     @POST
     @SuppressWarnings("unused")
     public HttpResponse doConfigure(StaplerRequest req, StaplerResponse rsp) throws ServletException {
+
         if (!Jenkins.get().hasPermission(UPDATE_CONFIG)) {
             return HttpResponses.errorWithoutStack(403, "You have no permissions to update global configuration");
         }
-
-        Logger logger = Logger.getLogger(ConfigurationManagementLink.class.getName());
-
 
         // Get logger for ConfigurationManagementLink
         GlobalYAMLPropertiesConfiguration globalConfig = getConfiguration();
