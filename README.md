@@ -50,9 +50,9 @@ There is two types of configuration sources:
  - **GitHub**: YAML configuration from GitHub repository
 
 To use GitHub configuration, you need to specify the following parameters:
-  - **Repository Name**: name of the repository
+  - **Repository Name**: Name of the repository
   - **Branch/Commit ref**: Any GitHub reference (branch, tag, or commit SHA) that uniquely identifies the commit
-  - **Path to YAML file**: path to YAML file in repository
+  - **Path to YAML file**: Path to YAML file in repository
   - **[GiHub App Credentials](https://github.com/jenkinsci/github-branch-source-plugin/blob/master/docs/github-app.adoc)**: GitHub App credentials to access repository
 
 To validate GitHub configuration source, click **Obtain Configuration** button. If validation is successful, you will see configuration that
