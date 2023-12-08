@@ -51,7 +51,7 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
             Yaml parser = new Yaml();
             parsedConfig = parser.load(yamlConfiguration);
         }
-        return parsedConfig;
+        return parsedConfig == null ? new HashMap<>() : parsedConfig;
     }
 
 
