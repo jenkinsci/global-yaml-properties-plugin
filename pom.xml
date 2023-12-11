@@ -35,7 +35,6 @@
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
 
         <workflow-job.version>1308.v58d48a_763b_31</workflow-job.version>
-        <lombok.version>1.18.28</lombok.version>
     </properties>
 
     <dependencyManagement>
@@ -91,12 +90,6 @@
             <groupId>org.jvnet.localizer</groupId>
             <artifactId>localizer</artifactId>
             <version>1.31</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
