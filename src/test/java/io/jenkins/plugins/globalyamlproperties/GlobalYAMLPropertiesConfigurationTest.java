@@ -242,6 +242,19 @@ public class GlobalYAMLPropertiesConfigurationTest {
     }
 
     @Test
+    public void testScriptedPipelineWithoutLocalConfigurationProperty() throws Exception {
+        String agentLabel = "my-agent";
+        jenkins.createOnlineSlave(Label.get(agentLabel));
+        WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
+        String pipelineScript
+                = "node {\n"
+                + "  println getLocalYAMLProperties()\n"
+                + "}";
+        job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
+    }
+
+    @Test
     public void testScriptedPipelineGetMultipleCategories() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));

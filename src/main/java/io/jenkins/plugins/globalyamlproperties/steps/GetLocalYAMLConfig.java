@@ -15,7 +15,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.PluginWrapper;
 import jenkins.model.Jenkins;
 
-import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,10 +54,16 @@ public class GetLocalYAMLConfig extends Step {
             if (isMultibranchPipeline(job)) {
                 org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject multibranchProject = (org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject) job.getParent();
                 MultibranchYAMLJobProperty localYamlConfiguration = multibranchProject.getProperties().get(MultibranchYAMLJobProperty.class);
+                if (localYamlConfiguration == null) {
+                    return new HashMap<>();
+                }
                 return Utils.deepCopyMap(localYamlConfiguration.getParsedConfig());
             } else {
                 WorkflowJob pipelineJob = (WorkflowJob) job;
                 PipelineYAMLJobProperty localYamlConfiguration = pipelineJob.getProperty(PipelineYAMLJobProperty.class);
+                if (localYamlConfiguration == null) {
+                    return new HashMap<>();
+                }
                 return Utils.deepCopyMap(localYamlConfiguration.getParsedConfig());
             }
         }
