@@ -34,7 +34,7 @@
         <jenkins.version>2.387.3</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
 
-        <workflow-job.version>1308.v58d48a_763b_31</workflow-job.version>
+        <workflow-job.version>1400.v7fd111b_ec82f</workflow-job.version>
     </properties>
 
     <dependencyManagement>
