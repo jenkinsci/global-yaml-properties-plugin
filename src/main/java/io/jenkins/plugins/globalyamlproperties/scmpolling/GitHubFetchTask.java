@@ -28,8 +28,7 @@ public class GitHubFetchTask extends AsyncPeriodicWork {
         for (Config config: GlobalYAMLPropertiesConfiguration.get().getConfigs()) {
             LOGGER.info(LOG_PREFIX + "Processing " + config.getName() + "...");
             try {
-                if (config.getConfigSource() instanceof ConfigSourceSCM) {
-                    ConfigSourceSCM configSourceSCM = (ConfigSourceSCM) config.getConfigSource();
+                if (config.getConfigSource() instanceof ConfigSourceSCM configSourceSCM) {
                     configSourceSCM.fetchConfiguration();
                 }
                 config.refreshConfiguration();

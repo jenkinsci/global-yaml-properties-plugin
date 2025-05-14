@@ -15,6 +15,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import hudson.PluginWrapper;
 import jenkins.model.Jenkins;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +32,7 @@ public class GetLocalYAMLConfig extends Step {
     }
 
     private static class GlobalPropertiesStepExecution extends SynchronousStepExecution<Map<String, Object>> {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         protected GlobalPropertiesStepExecution(StepContext context) {

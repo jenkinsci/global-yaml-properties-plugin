@@ -2,9 +2,7 @@ package io.jenkins.plugins.globalyamlproperties;
 
 import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest2;

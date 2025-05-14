@@ -16,6 +16,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
         return yamlConfiguration;
     }
 
+    @Serial
     private void readObject(@NonNull ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         Yaml parser = new Yaml();
@@ -65,7 +67,6 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public boolean isApplicable(Class<? extends Job> jobType) {
             return true;
         }
@@ -89,5 +90,6 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
         }
     }
 
+    @Serial
     private static final long serialVersionUID = 1L;
 }

@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +40,7 @@ public class GetGlobalYAMLConfigNamesByCategory extends Step {
     private static class GlobalPropertiesStepExecution extends SynchronousStepExecution<List<String>> {
         private final String category;
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         protected GlobalPropertiesStepExecution(StepContext context, String category) {

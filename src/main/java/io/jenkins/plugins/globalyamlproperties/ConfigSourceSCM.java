@@ -4,6 +4,7 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Descriptor;
+import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
@@ -16,6 +17,7 @@ import org.kohsuke.stapler.verb.POST;
 import org.jenkinsci.plugins.github_branch_source.GitHubAppCredentials;
 
 import java.io.*;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -155,8 +157,11 @@ public class ConfigSourceSCM implements ConfigSource, Serializable {
         @POST
         public ListBoxModel doFillCredentialsIdItems() {
             ListBoxModel items = new ListBoxModel();
-            List<GitHubAppCredentials> credentials = CredentialsProvider.lookupCredentials(
-                    GitHubAppCredentials.class
+            List<GitHubAppCredentials> credentials = CredentialsProvider.lookupCredentialsInItem(
+                    GitHubAppCredentials.class,
+                    null,
+                    ACL.SYSTEM2,
+                    Collections.emptyList()
             );
 
             for (GitHubAppCredentials c : credentials) {
