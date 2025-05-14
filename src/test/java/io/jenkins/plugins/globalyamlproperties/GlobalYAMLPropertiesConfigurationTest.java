@@ -98,15 +98,12 @@ public class GlobalYAMLPropertiesConfigurationTest {
 
         // Deserialize the object from the byte array
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-        try {
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
             Object deserializedObject = objectInputStream.readObject();
             // The deserialization should be successful
             assert deserializedObject instanceof GlobalYAMLPropertiesConfiguration;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } finally {
-            objectInputStream.close();
         }
     }
 
@@ -120,9 +117,10 @@ public class GlobalYAMLPropertiesConfigurationTest {
         globalConfiguration.setConfigs(config);
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
-                = "node {\n"
-                + "  println getGlobalYAMLProperties(\"test\").version\n"
-                + "}";
+                = """
+                node {
+                  println getGlobalYAMLProperties("test").version
+                }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
         jenkins.assertLogContains("1.0", completedBuild);
@@ -138,9 +136,10 @@ public class GlobalYAMLPropertiesConfigurationTest {
         globalConfiguration.setConfigs(config);
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
-                = "node {\n"
-                + "  println getGlobalYAMLProperties().version\n"
-                + "}";
+                = """
+                node {
+                  println getGlobalYAMLProperties().version
+                }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
         jenkins.assertLogContains("Warning: Configuration is empty", completedBuild);
@@ -156,9 +155,10 @@ public class GlobalYAMLPropertiesConfigurationTest {
         globalConfiguration.setConfigs(config);
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
-                = "node {\n"
-                + "  println getGlobalYAMLProperties().version\n"
-                + "}";
+                = """
+                node {
+                  println getGlobalYAMLProperties().version
+                }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
         jenkins.assertLogContains("Obtaining default configuration", completedBuild);
@@ -172,9 +172,10 @@ public class GlobalYAMLPropertiesConfigurationTest {
         GlobalYAMLPropertiesConfiguration globalConfiguration = createMultipleTestInstances();
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
-                = "node {\n"
-                + "  println getGlobalYAMLCategories()\n"
-                + "}";
+                = """
+                node {
+                  println getGlobalYAMLCategories()
+                }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
         jenkins.assertLogContains(category, completedBuild);
@@ -233,9 +234,10 @@ public class GlobalYAMLPropertiesConfigurationTest {
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         job.addProperty(new PipelineYAMLJobProperty(yamlConfig));
         String pipelineScript
-                = "node {\n"
-                + "  println getLocalYAMLProperties()\n"
-                + "}";
+                = """
+                node {
+                  println getLocalYAMLProperties()
+                }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
         jenkins.assertLogContains(parsedYamlConfig, completedBuild);
@@ -247,9 +249,10 @@ public class GlobalYAMLPropertiesConfigurationTest {
         jenkins.createOnlineSlave(Label.get(agentLabel));
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
-                = "node {\n"
-                + "  println getLocalYAMLProperties()\n"
-                + "}";
+                = """
+                node {
+                  println getLocalYAMLProperties()
+                }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
     }
@@ -261,9 +264,10 @@ public class GlobalYAMLPropertiesConfigurationTest {
         GlobalYAMLPropertiesConfiguration globalConfiguration = createMultiCategorizedTestInstances();
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
-                = "node {\n"
-                + "  println getGlobalYAMLCategories()\n"
-                + "}";
+                = """
+                node {
+                  println getGlobalYAMLCategories()
+                }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
         jenkins.assertLogContains(category + "0", completedBuild);

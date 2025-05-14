@@ -12,7 +12,6 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,10 +1,11 @@
 package io.jenkins.plugins.globalyamlproperties;
 
 import com.cloudbees.plugins.credentials.*;
-import org.springframework.lang.Nullable;
+import hudson.security.ACL;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +32,11 @@ public class Utils {
     }
 
     static Credentials getCredentialsById(String credentialsId) {
-        List<Credentials> credentialsList = CredentialsProvider.lookupCredentials(
-                Credentials.class
+        List<Credentials> credentialsList = CredentialsProvider.lookupCredentialsInItem(
+                Credentials.class,
+                null,
+                ACL.SYSTEM2,
+                Collections.emptyList()
         );
         Credentials requestedCredentials = CredentialsMatchers.firstOrNull(
                 credentialsList,

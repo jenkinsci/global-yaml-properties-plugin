@@ -9,13 +9,14 @@ import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
         return yamlConfiguration;
     }
 
+    @Serial
     private void readObject(@NonNull ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         Yaml parser = new Yaml();
@@ -59,19 +61,18 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
     public static class DescriptorImpl extends JobPropertyDescriptor {
 
         @Override
-        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+        public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
             // handle the submitted form data
             return super.configure(req, json);
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public boolean isApplicable(Class<? extends Job> jobType) {
             return true;
         }
 
         @Override
-        public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) {
+        public JobProperty<?> newInstance(StaplerRequest2 req, JSONObject formData) {
             String yamlConfiguration = formData.getString("yamlConfiguration");
             return new PipelineYAMLJobProperty(yamlConfiguration);
         }
@@ -89,5 +90,6 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
         }
     }
 
+    @Serial
     private static final long serialVersionUID = 1L;
 }

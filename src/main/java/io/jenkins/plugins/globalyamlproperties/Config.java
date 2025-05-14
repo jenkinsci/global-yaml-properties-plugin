@@ -73,8 +73,7 @@ public class Config extends AbstractDescribableImpl<Config> implements Serializa
     public void refreshConfiguration() throws IOException {
         Logger logger = Logger.getLogger(Config.class.getName());
         logger.info("Refreshing configuration for " + this.name);
-        if (getConfigSource() instanceof ConfigSourceSCM) {
-            ConfigSourceSCM configSourceSCM = (ConfigSourceSCM) getConfigSource();
+        if (getConfigSource() instanceof ConfigSourceSCM configSourceSCM) {
             configSourceSCM.fetchConfiguration();
         }
         parseConfiguration();

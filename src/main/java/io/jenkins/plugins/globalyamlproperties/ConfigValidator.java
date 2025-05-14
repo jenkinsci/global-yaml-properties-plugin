@@ -1,10 +1,7 @@
 package io.jenkins.plugins.globalyamlproperties;
 
 import hudson.util.FormValidation;
-import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 

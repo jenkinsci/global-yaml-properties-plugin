@@ -2,12 +2,10 @@ package io.jenkins.plugins.globalyamlproperties;
 
 import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -111,7 +109,7 @@ public class GlobalYAMLPropertiesConfiguration extends GlobalConfiguration imple
     }
 
     @Override
-    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+    public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
         String configsField = "configs";
 
         if (!json.has(configsField)) {

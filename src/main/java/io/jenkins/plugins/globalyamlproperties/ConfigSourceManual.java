@@ -2,8 +2,6 @@ package io.jenkins.plugins.globalyamlproperties;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
-import hudson.model.AbstractDescribableImpl;
-import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
@@ -13,7 +11,6 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class ConfigSourceManual implements ConfigSource, Serializable {

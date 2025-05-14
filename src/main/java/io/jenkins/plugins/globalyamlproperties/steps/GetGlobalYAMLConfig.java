@@ -41,6 +41,7 @@ public class GetGlobalYAMLConfig extends Step {
     private static class GlobalPropertiesStepExecution extends SynchronousStepExecution<Map<String, Object>> {
 
         private final String configName;
+        @Serial
         private static final long serialVersionUID = 1L;
 
         protected GlobalPropertiesStepExecution(StepContext context, String configName) {
