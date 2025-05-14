@@ -9,7 +9,7 @@ import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.verb.POST;
 import org.yaml.snakeyaml.Yaml;
@@ -59,7 +59,7 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
     public static class DescriptorImpl extends JobPropertyDescriptor {
 
         @Override
-        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+        public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
             // handle the submitted form data
             return super.configure(req, json);
         }
@@ -71,7 +71,7 @@ public class PipelineYAMLJobProperty extends JobProperty<AbstractProject<?, ?>> 
         }
 
         @Override
-        public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) {
+        public JobProperty<?> newInstance(StaplerRequest2 req, JSONObject formData) {
             String yamlConfiguration = formData.getString("yamlConfiguration");
             return new PipelineYAMLJobProperty(yamlConfiguration);
         }

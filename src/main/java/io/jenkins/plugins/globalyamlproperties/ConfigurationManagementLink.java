@@ -12,7 +12,7 @@ import org.kohsuke.stapler.*;
 import org.kohsuke.stapler.verb.POST;
 import org.springframework.lang.NonNull;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class ConfigurationManagementLink extends ManagementLink {
 
     @POST
     @SuppressWarnings("unused")
-    public HttpResponse doConfigure(StaplerRequest req, StaplerResponse rsp) throws ServletException {
+    public HttpResponse doConfigure(StaplerRequest2 req, StaplerResponse2 rsp) throws ServletException {
 
         if (!Jenkins.get().hasPermission(UPDATE_CONFIG)) {
             return HttpResponses.errorWithoutStack(403, "You have no permissions to update global configuration");
