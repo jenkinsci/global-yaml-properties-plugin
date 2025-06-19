@@ -6,89 +6,97 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
-import org.junit.Test;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GlobalYAMLPropertiesConfigurationTest {
+@WithJenkins
+class GlobalYAMLPropertiesConfigurationTest {
 
+    private static final String YAML_CONFIG = "version: 1.0";
+    private static final String NAME = "test";
+    private static final String CATEGORY = "example";
+    private static final String EMPTY_YAML_CONFIG = "";
+    private static final String PARSED_YAML_CONFIG = "{version=1.0}";
 
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+    private JenkinsRule jenkins;
 
-    public String yamlConfig = "version: 1.0";
-    public String name = "test";
-    public String category = "example";
-    public String emptyYamlConfig = "";
-    public String parsedYamlConfig = "{version=1.0}";
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
-
-    GlobalYAMLPropertiesConfiguration createTestInstance() {
+    private static GlobalYAMLPropertiesConfiguration createTestInstance() {
         GlobalYAMLPropertiesConfiguration globalConfiguration = GlobalYAMLPropertiesConfiguration.get();
         List<Config> config = new ArrayList<>();
-        config.add(new Config(name, category, new ConfigSourceManual(yamlConfig)));
+        config.add(new Config(NAME, CATEGORY, new ConfigSourceManual(YAML_CONFIG)));
         globalConfiguration.setConfigs(config);
         return globalConfiguration;
     }
 
-    GlobalYAMLPropertiesConfiguration createMultipleTestInstances() {
+    private static GlobalYAMLPropertiesConfiguration createMultipleTestInstances() {
         GlobalYAMLPropertiesConfiguration globalConfiguration = GlobalYAMLPropertiesConfiguration.get();
         List<Config> config = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            config.add(new Config(name + i, category, new ConfigSourceManual(yamlConfig)));
+            config.add(new Config(NAME + i, CATEGORY, new ConfigSourceManual(YAML_CONFIG)));
         }
         globalConfiguration.setConfigs(config);
         return globalConfiguration;
     }
 
-    GlobalYAMLPropertiesConfiguration createMultiCategorizedTestInstances() {
+    private static GlobalYAMLPropertiesConfiguration createMultiCategorizedTestInstances() {
         GlobalYAMLPropertiesConfiguration globalConfiguration = GlobalYAMLPropertiesConfiguration.get();
         List<Config> config = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            config.add(new Config(name + i, category + i, new ConfigSourceManual(yamlConfig)));
+            config.add(new Config(NAME + i, CATEGORY + i, new ConfigSourceManual(YAML_CONFIG)));
         }
         globalConfiguration.setConfigs(config);
         return globalConfiguration;
     }
 
     @Test
-    public void testGetAllCategories() throws GlobalYAMLPropertiesConfigurationException {
+    void testGetAllCategories() {
         GlobalYAMLPropertiesConfiguration globalConfiguration = createTestInstance();
-        assert globalConfiguration.getCategories().contains(category);
+        assertTrue(globalConfiguration.getCategories().contains(CATEGORY));
     }
 
     @Test
-    public void testConfigsFromCategory() throws GlobalYAMLPropertiesConfigurationException {
+    void testConfigsFromCategory() {
         GlobalYAMLPropertiesConfiguration globalConfiguration = createMultipleTestInstances();
-        assert globalConfiguration.getConfigsByCategory(category).size() == 3;
+        assertEquals(3, globalConfiguration.getConfigsByCategory(CATEGORY).size());
 
         // Create assertion that each config's category is equal to the category
-        assert globalConfiguration.getConfigsByCategory(category).stream().allMatch(config -> config.getCategory().equals(category));
-
+        assertTrue(globalConfiguration.getConfigsByCategory(CATEGORY).stream().allMatch(config -> config.getCategory().equals(CATEGORY)));
     }
 
     @Test
-    public void testConfigApi() throws GlobalYAMLPropertiesConfigurationException {
+    void testConfigApi() throws Exception {
         GlobalYAMLPropertiesConfiguration globalConfiguration = createTestInstance();
-        assert globalConfiguration.getConfigByName(name).getYamlConfig().equals(yamlConfig);
-        assert globalConfiguration.getConfigs().get(0).getYamlConfig().equals(yamlConfig);
-        assert globalConfiguration.getConfigs().get(0).getName().equals(name);
-        assert globalConfiguration.getConfigs().get(0).getConfigMap().containsKey("version");
-        assert globalConfiguration.getConfigs().get(0).getCategory().equals(category);
+        assertEquals(YAML_CONFIG, globalConfiguration.getConfigByName(NAME).getYamlConfig());
+        assertEquals(YAML_CONFIG, globalConfiguration.getConfigs().get(0).getYamlConfig());
+        assertEquals(NAME, globalConfiguration.getConfigs().get(0).getName());
+        assertTrue(globalConfiguration.getConfigs().get(0).getConfigMap().containsKey("version"));
+        assertEquals(CATEGORY, globalConfiguration.getConfigs().get(0).getCategory());
     }
 
     @Test
-    public void testSerialization() throws IOException {
+    void testSerialization() throws Exception {
         GlobalYAMLPropertiesConfiguration globalConfiguration = createTestInstance();
         List<Config> configs = globalConfiguration.getConfigs();
-        configs.add(new Config("test2", category, new ConfigSourceSCM("repo", "owner", "master", "testCreds", "path")));
+        configs.add(new Config("test2", CATEGORY, new ConfigSourceSCM("repo", "owner", "master", "testCreds", "path")));
         globalConfiguration.setConfigs(configs);
         // Serialize the object to a byte array
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -101,19 +109,17 @@ public class GlobalYAMLPropertiesConfigurationTest {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
             Object deserializedObject = objectInputStream.readObject();
             // The deserialization should be successful
-            assert deserializedObject instanceof GlobalYAMLPropertiesConfiguration;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            assertInstanceOf(GlobalYAMLPropertiesConfiguration.class, deserializedObject);
         }
     }
 
     @Test
-    public void testScriptedPipeline() throws Exception {
+    void testScriptedPipeline() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         GlobalYAMLPropertiesConfiguration globalConfiguration = GlobalYAMLPropertiesConfiguration.get();
         List<Config> config = new ArrayList<>();
-        config.add(new Config(name, yamlConfig, new ConfigSourceManual(yamlConfig)));
+        config.add(new Config(NAME, YAML_CONFIG, new ConfigSourceManual(YAML_CONFIG)));
         globalConfiguration.setConfigs(config);
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
@@ -127,12 +133,12 @@ public class GlobalYAMLPropertiesConfigurationTest {
     }
 
     @Test
-    public void testScriptedPipelineEmptyConfig() throws Exception {
+    void testScriptedPipelineEmptyConfig() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         GlobalYAMLPropertiesConfiguration globalConfiguration = GlobalYAMLPropertiesConfiguration.get();
         List<Config> config = new ArrayList<>();
-        config.add(new Config(name, "", new ConfigSourceManual(emptyYamlConfig)));
+        config.add(new Config(NAME, "", new ConfigSourceManual(EMPTY_YAML_CONFIG)));
         globalConfiguration.setConfigs(config);
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
@@ -146,12 +152,12 @@ public class GlobalYAMLPropertiesConfigurationTest {
     }
 
     @Test
-    public void testScriptedPipelineDefaultConfig() throws Exception {
+    void testScriptedPipelineDefaultConfig() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         GlobalYAMLPropertiesConfiguration globalConfiguration = GlobalYAMLPropertiesConfiguration.get();
         List<Config> config = new ArrayList<>();
-        config.add(new Config(name, yamlConfig, new ConfigSourceManual(yamlConfig)));
+        config.add(new Config(NAME, YAML_CONFIG, new ConfigSourceManual(YAML_CONFIG)));
         globalConfiguration.setConfigs(config);
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
@@ -166,7 +172,7 @@ public class GlobalYAMLPropertiesConfigurationTest {
     }
 
     @Test
-    public void testScriptedPipelineCategorized() throws Exception {
+    void testScriptedPipelineCategorized() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         GlobalYAMLPropertiesConfiguration globalConfiguration = createMultipleTestInstances();
@@ -178,28 +184,28 @@ public class GlobalYAMLPropertiesConfigurationTest {
                 }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
-        jenkins.assertLogContains(category, completedBuild);
+        jenkins.assertLogContains(CATEGORY, completedBuild);
     }
 
     @Test
-    public void testScriptedPipelineGetConfigNamesByCategory() throws Exception {
+    void testScriptedPipelineGetConfigNamesByCategory() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         GlobalYAMLPropertiesConfiguration globalConfiguration = createMultipleTestInstances();
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
         String pipelineScript
                 = "node {\n"
-                + "  println getGlobalYAMLConfigNamesByCategory('" + category + "')\n"
+                + "  println getGlobalYAMLConfigNamesByCategory('" + CATEGORY + "')\n"
                 + "}";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
-        jenkins.assertLogContains(name + "0", completedBuild);
-        jenkins.assertLogContains(name + "1", completedBuild);
-        jenkins.assertLogContains(name + "2", completedBuild);
+        jenkins.assertLogContains(NAME + "0", completedBuild);
+        jenkins.assertLogContains(NAME + "1", completedBuild);
+        jenkins.assertLogContains(NAME + "2", completedBuild);
     }
 
     @Test
-    public void testMultibranchJobConfiguration() throws Exception {
+    void testMultibranchJobConfiguration() throws Exception {
         // Create a MultiBranch Pipeline
         WorkflowMultiBranchProject mp = jenkins.jenkins.createProject(WorkflowMultiBranchProject.class, "my-multi-branch-project");
 
@@ -207,32 +213,32 @@ public class GlobalYAMLPropertiesConfigurationTest {
         mp.setProjectFactory(new WorkflowBranchProjectFactory());
 
         // Adding a property to the multibranch pipeline
-        mp.addProperty(new MultibranchYAMLJobProperty(yamlConfig)); // Replace with your actual property and value
+        mp.addProperty(new MultibranchYAMLJobProperty(YAML_CONFIG)); // Replace with your actual property and value
 
         MultibranchYAMLJobProperty property = mp.getProperties().get(MultibranchYAMLJobProperty.class);
         assertNotNull(property);
     }
 
     @Test
-    public void testMultibranchJobConfigurationParsing() throws Exception {
+    void testMultibranchJobConfigurationParsing() throws Exception {
         // Create a MultiBranch Pipeline
         WorkflowMultiBranchProject mp = jenkins.jenkins.createProject(WorkflowMultiBranchProject.class, "my-multi-branch-project");
 
         // Setup the branch project factory (how Jenkins should create pipeline jobs for branches)
         mp.setProjectFactory(new WorkflowBranchProjectFactory());
         // Adding a property to the multibranch pipeline
-        mp.addProperty(new MultibranchYAMLJobProperty(yamlConfig)); // Replace with your actual property and value
+        mp.addProperty(new MultibranchYAMLJobProperty(YAML_CONFIG)); // Replace with your actual property and value
 
         MultibranchYAMLJobProperty property = mp.getProperties().get(MultibranchYAMLJobProperty.class);
         assertEquals(1.0, property.getParsedConfig().get("version"));
     }
 
     @Test
-    public void testScriptedPipelineLocalConfiguration() throws Exception {
+    void testScriptedPipelineLocalConfiguration() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
-        job.addProperty(new PipelineYAMLJobProperty(yamlConfig));
+        job.addProperty(new PipelineYAMLJobProperty(YAML_CONFIG));
         String pipelineScript
                 = """
                 node {
@@ -240,11 +246,11 @@ public class GlobalYAMLPropertiesConfigurationTest {
                 }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
-        jenkins.assertLogContains(parsedYamlConfig, completedBuild);
+        jenkins.assertLogContains(PARSED_YAML_CONFIG, completedBuild);
     }
 
     @Test
-    public void testScriptedPipelineWithoutLocalConfigurationProperty() throws Exception {
+    void testScriptedPipelineWithoutLocalConfigurationProperty() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         WorkflowJob job = jenkins.createProject(WorkflowJob.class, "test-scripted-pipeline");
@@ -254,11 +260,11 @@ public class GlobalYAMLPropertiesConfigurationTest {
                   println getLocalYAMLProperties()
                 }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
+        jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
     }
 
     @Test
-    public void testScriptedPipelineGetMultipleCategories() throws Exception {
+    void testScriptedPipelineGetMultipleCategories() throws Exception {
         String agentLabel = "my-agent";
         jenkins.createOnlineSlave(Label.get(agentLabel));
         GlobalYAMLPropertiesConfiguration globalConfiguration = createMultiCategorizedTestInstances();
@@ -270,9 +276,9 @@ public class GlobalYAMLPropertiesConfigurationTest {
                 }""";
         job.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun completedBuild = jenkins.assertBuildStatusSuccess(job.scheduleBuild2(0));
-        jenkins.assertLogContains(category + "0", completedBuild);
-        jenkins.assertLogContains(category + "1", completedBuild);
-        jenkins.assertLogContains(category + "2", completedBuild);
+        jenkins.assertLogContains(CATEGORY + "0", completedBuild);
+        jenkins.assertLogContains(CATEGORY + "1", completedBuild);
+        jenkins.assertLogContains(CATEGORY + "2", completedBuild);
     }
 
 }
